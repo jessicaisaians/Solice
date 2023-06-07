@@ -9,7 +9,16 @@ const Index: FC<IndexProps> = ({}) => {
   const containerRef = useRef(null);
   return (
     <LocomotiveScrollProviderClient
-      props={{ options: { smooth: true }, watch: [], containerRef }}
+      props={{
+        options: {
+          smooth: true,
+          smartphone: {
+            smooth: true,
+          },
+        },
+        watch: [],
+        containerRef,
+      }}
     >
       <main
         className="min-h-[1200px] overflow-hidden relative"
