@@ -10,11 +10,11 @@ const HeroVideo: FC<HeroVideoProps> = ({}) => {
     <section className="w-full h-[100vh] relative">
       <div className="absolute top-0 bottom-0 left-0 right-0 z-1 bg-black/40"></div>
       <div
-        className={`flex flex-col z-30 absolute top-0 bottom-0 left-0 right-0 z-5 flex justify-center items-center text-white/80 text-5xl font-bold`}
+        className={`flex-col z-30 absolute top-0 bottom-0 left-0 right-0 z-5 flex justify-center items-center text-white/80 text-5xl font-bold`}
       >
         <div
           style={{ direction: "ltr" }}
-          className={`${cinzel.className} flex z-30 cursor-scale z-5 flex justify-center items-center text-white/80 text-5xl font-bold`}
+          className={`${cinzel.className} select-none z-30 cursor-scale z-5 flex justify-center items-center text-white/80 text-5xl font-bold`}
         >
           <h1 data-scroll data-scroll-speed="4" data-scroll-delay="0.24">
             S
@@ -41,7 +41,7 @@ const HeroVideo: FC<HeroVideoProps> = ({}) => {
           data-scroll-speed="4"
           data-scroll-delay="0.05"
         >
-          خاص مثل خودت
+          شیک. مدرن. منحصربه‌فرد
         </h2>
       </div>
       <video
