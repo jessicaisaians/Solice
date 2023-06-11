@@ -1,5 +1,5 @@
-import HomeContent from "./components/HomeContent";
+import HeroImage from "./components/HomeContent/sections/HeroImage/index";
 
 export default function Home() {
-  return <HomeContent />;
+  return <HeroImage />;
 }

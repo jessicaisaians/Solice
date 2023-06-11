@@ -1,6 +1,5 @@
 "use client";
 import { gsap } from "gsap";
-import { usePathname } from "next/navigation";
 import { FC, useEffect } from "react";
 interface CursorProps {}
 
@@ -31,8 +30,14 @@ export const initCustomCursor = () => {
     const onMouseEnterLink = (e: any) => {
       const link = e.target;
       if (link.classList.contains("view")) {
-        gsap.to(cursor, { scale: 4, ease: "power2.out", duration: 0.2 });
-        if (cursorText) cursorText.style.display = "block";
+        gsap.to(cursor, {
+          scale: 4,
+          ease: "power2.out",
+          duration: 0.2,
+        });
+        if (cursorText) {
+          cursorText.style.display = "block";
+        }
       } else {
         gsap.to(cursor, { scale: 4, ease: "power2.out", duration: 0.2 });
       }
@@ -53,14 +58,17 @@ export const initCustomCursor = () => {
   }
 };
 const Cursor: FC<CursorProps> = ({}) => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
+  // useEffect(() => {
+  //   const shouldApplyCustomCursor = pathname === "/";
+  //   if (shouldApplyCustomCursor) initCustomCursor();
+  // }, [pathname]);
   useEffect(() => {
-    const shouldApplyCustomCursor = pathname === "/";
-    if (shouldApplyCustomCursor) initCustomCursor();
-  }, [pathname]);
+    initCustomCursor();
+  }, []);
   return (
     <div id="custom-cursor" className="custom-cursor">
-      <span className="cursor-text">مشاهده</span>
+      <span className="cursor-text text-stone-500">مشاهده</span>
     </div>
   );
 };

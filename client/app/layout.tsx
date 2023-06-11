@@ -1,9 +1,11 @@
+import clsx from "clsx";
 import "locomotive-scroll/dist/locomotive-scroll.css";
-import { Noto_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import Cursor from "./components/Cursor";
+import HomeContent from "./components/HomeContent";
+import Navbar from "./components/Navbar";
 import "./globals.css";
-
-const inter = Noto_Sans({ weight: "300", subsets: ["latin"] });
+const myFont = localFont({ src: "./../public/iran-sans.ttf" });
 
 export const metadata = {
   title: "Solice",
@@ -17,10 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl">
-      <body className={inter.className}>
-        <Cursor />
-        {children}
+    <html lang="fa" dir="rtl" className="bg-stone-950">
+      <body className={clsx(myFont.className, "bg-stone-950")}>
+        <HomeContent>
+          <Cursor />
+          <Navbar />
+          {children}
+        </HomeContent>
       </body>
     </html>
   );
