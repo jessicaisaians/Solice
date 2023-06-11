@@ -1,11 +1,11 @@
 "use client";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import { FC, useEffect, useRef } from "react";
 import { BsArrowLeft } from "react-icons/bs";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
+import { Space_Grotesk } from "next/font/google";
 const grotesk = Space_Grotesk({ weight: "400", subsets: ["latin"] });
 interface HeroVideoProps {}
 const HeroVideo: FC<HeroVideoProps> = ({}) => {

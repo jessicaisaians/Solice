@@ -9,6 +9,7 @@ interface NavbarProps {}
 const linkWidthMap = {
   "/": ".home_link",
   "/shop": ".shop_link",
+  "/collections": ".collections_link",
   "/about": ".about_link",
   "/contact": ".contact_link",
 };
@@ -91,12 +92,13 @@ const Navbar: FC<NavbarProps> = ({}) => {
         </li>
         <li
           className={clsx(
-            "shop_link",
+            "collections_link",
             "nav_link_list_item",
-            pathname === "/shop" ? "text-white" : "text-[#8c8c8c]"
+            pathname === "/collections" ? "text-white" : "text-[#8c8c8c]"
           )}
           onClick={() => {
-            const currElementWidth = document.querySelector(".shop_link");
+            const currElementWidth =
+              document.querySelector(".collections_link");
             adjustActiveBoxWidth(
               currElementWidth?.clientWidth?.toString() ?? "64"
             );
@@ -138,7 +140,7 @@ const Navbar: FC<NavbarProps> = ({}) => {
           </Link>
         </li>
         <li
-          className={`right-5 active_item_box block absolute top-1/2 -translate-y-1/2 h-full my-auto mx-0 rounded-2xl will-change-transform -z-10 bg-[#2f3133] `}
+          className={`right-5 active_item_box block absolute top-1/2 -translate-y-1/2 h-full my-auto mx-0 rounded-3xl will-change-transform -z-10 bg-[#2f3133] `}
           style={{
             transform: "translate(0%, -50%) translate(0, 0)",
             translate: "none",

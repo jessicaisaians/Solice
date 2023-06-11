@@ -16,11 +16,11 @@
   height: 12px;
   border-radius: 50%;
   z-index: 9998;
-  padding: 10px;
+  padding: 9px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: #e7e5e4 !important;
 }
 .cursor-text {
   font-size: 5px;
@@ -173,14 +173,15 @@ body {
 
 /* Header Image */
 .header_container {
-  display: grid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding-bottom: 1rem;
   width: 100%;
   position: relative;
   overflow: hidden;
-  /* padding: 0 8.33%; */
   padding: 0 5%;
-  padding-top: 10vh;
+  padding-top: 12vh;
   margin-bottom: 25vh;
 }
 .header_img_container {
@@ -252,10 +253,10 @@ body {
 .navigation {
   background-color: #1a1b1c;
   position: fixed;
-  top: 0.75rem;
+  top:1rem;
   left: 50%;
   border-radius: 1.5rem;
-  height: 3.2rem;
+  height: 3.4rem;
   padding: 0.4rem 0;
   transform: translateX(-50%) translateY(-3rem);
   z-index: 998;
