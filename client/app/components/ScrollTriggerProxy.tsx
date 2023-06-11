@@ -1,16 +1,17 @@
 "use client";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FC, useEffect } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { useEffect } from "react";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 
-interface ScrollTriggerProxyProps {}
-
-const ScrollTriggerProxy: FC<ScrollTriggerProxyProps> = ({}) => {
+const ScrollTriggerProxy = () => {
   const { scroll } = useLocomotiveScroll();
   gsap.registerPlugin(ScrollTrigger);
+
   useEffect(() => {
     if (scroll) {
       const element = scroll?.el;
+
       scroll.on("scroll", ScrollTrigger.update);
       ScrollTrigger.scrollerProxy(element, {
         scrollTop(value) {
@@ -26,17 +27,16 @@ const ScrollTriggerProxy: FC<ScrollTriggerProxyProps> = ({}) => {
             height: window.innerHeight,
           };
         },
-        pinType: (document.querySelector(".smooth-scroll") as any)?.style
-          .transform
-          ? "transform"
-          : "fixed",
+        pinType: element.style.transform ? "transform" : "fixed",
       });
     }
-    return () => {
-      ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      ScrollTrigger.refresh();
-    };
+
+    ScrollTrigger.addEventListener("refresh", () => scroll?.update());
+    ScrollTrigger.refresh();
+    return () => {};
   }, [scroll]);
-  return <div>ScrollTriggerProxy Page</div>;
+
+  return null;
 };
+
 export default ScrollTriggerProxy;
