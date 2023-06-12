@@ -1,8 +1,10 @@
 "use client";
 import { FC, useRef } from "react";
+import Cursor from "../Cursor";
+import HamburgerMenu from "../HamburgerMenu";
 import LocomotiveScrollProviderClient from "../LocomotiveScrollProviderClient";
 import Navbar from "../Navbar";
-import Cursor from "../Cursor";
+import Footer from "./sections/Footer";
 
 interface IndexProps {
   children: any;
@@ -14,6 +16,7 @@ const Index: FC<IndexProps> = ({ children }) => {
   return (
     <main className="min-h-[1200px] relative">
       <Navbar />
+
       <Cursor />
       <LocomotiveScrollProviderClient
         props={{
@@ -32,11 +35,12 @@ const Index: FC<IndexProps> = ({ children }) => {
       >
         <div className="App" data-scroll-container ref={containerRef}>
           {children}
+          <HamburgerMenu />
           {/* <StickyScroll /> */}
-          {/* <Collections />
-        <Footer /> */}
+          {/* <Collections />*/}
         </div>
       </LocomotiveScrollProviderClient>
+      <Footer />
     </main>
   );
 };

@@ -1,9 +1,10 @@
 "use client";
+import { useWindowWidth } from "@react-hook/window-size";
 import clsx from "clsx";
 import { gsap } from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FC, useEffect, useState } from "react";
+import { FC, useLayoutEffect, useState } from "react";
 interface NavbarProps {}
 
 const linkWidthMap = {
@@ -15,6 +16,7 @@ const linkWidthMap = {
 };
 const Navbar: FC<NavbarProps> = ({}) => {
   const pathname = usePathname();
+  const onlyWidth = useWindowWidth();
   const [activeBoxWidth, setActiveBoxWidth] = useState("64");
 
   const adjustActiveBoxWidth = (w: string) => {
@@ -27,7 +29,7 @@ const Navbar: FC<NavbarProps> = ({}) => {
     });
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const elementClassName = Object.hasOwn(linkWidthMap, pathname)
       ? linkWidthMap[pathname as keyof typeof linkWidthMap]
       : "";
@@ -45,9 +47,9 @@ const Navbar: FC<NavbarProps> = ({}) => {
       const { right: navListRight } = navList.getBoundingClientRect();
       adjustActiveBoxRight(navListRight - elementRight);
     }
-  }, [activeBoxWidth, pathname]);
+  }, [activeBoxWidth, pathname, onlyWidth]);
   return (
-    <nav className="navigation w-5/6 sm:w-2/3">
+    <nav className="navigation w-5/6 sm:w-2/3 hidden lg:block ">
       <ul className="nav_link_list">
         <li
           className={clsx(
@@ -117,6 +119,12 @@ const Navbar: FC<NavbarProps> = ({}) => {
             "nav_link_list_item",
             pathname === "/contact" ? "text-white" : "text-[#8c8c8c]"
           )}
+          onClick={() => {
+            const currElementWidth = document.querySelector(".contact_link");
+            adjustActiveBoxWidth(
+              currElementWidth?.clientWidth?.toString() ?? "64"
+            );
+          }}
         >
           <Link
             className="h-full flex items-center font-medium text-xs  sm:text-md  md:text-base text-center"
@@ -131,6 +139,12 @@ const Navbar: FC<NavbarProps> = ({}) => {
             "nav_link_list_item",
             pathname === "/about" ? "text-white" : "text-[#8c8c8c]"
           )}
+          onClick={() => {
+            const currElementWidth = document.querySelector(".about_link");
+            adjustActiveBoxWidth(
+              currElementWidth?.clientWidth?.toString() ?? "64"
+            );
+          }}
         >
           <Link
             className="h-full flex items-center font-medium text-xs  sm:text-md  md:text-base text-center"

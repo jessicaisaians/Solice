@@ -253,7 +253,7 @@ body {
 .navigation {
   background-color: #1a1b1c;
   position: fixed;
-  top:1rem;
+  top: 1rem;
   left: 50%;
   border-radius: 1.5rem;
   height: 3.4rem;
@@ -278,8 +278,17 @@ body {
   translate: none;
   rotate: none;
   scale: none;
-  transform: translate3d(0px, 0px, 0px);
   padding: 0 2.6%;
+  opacity: 1;
+  transform: translate3d(0px, 0px, 0px);
+}
+.nav_link_list_item_mobile {
+  translate: none;
+  rotate: none;
+  scale: none;
+  padding: 0 2.6%;
+  opacity: 0;
+  transform: translate(0px, 70px) skew(0deg, 3deg);
 }
 
 /* End of Navbar */
