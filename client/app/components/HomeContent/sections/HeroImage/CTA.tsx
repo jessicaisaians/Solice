@@ -5,12 +5,12 @@ interface HeroImageProps {}
 
 const HeroImage: FC<HeroImageProps> = ({}) => {
   return (
-    <div className="h-screen absolute top-0 bottom-0 right-[54px] flex justify-center items-center">
+    <div className="h-fit lg:h-screen lg:absolute lg:top-[40%] lg:-translate-y-1/2 lg:right-[54px] flex order-4 justify-center items-center">
       <a
         href="/shop"
-        className="relative px-3 py-1 h-auto transition-all duration-300 view flex-row gap-2 z-5 flex justify-center items-center text-white/80 text-1xl"
+        className="view mb-20 lg:mb-0 relative px-3 py-1 h-auto transition-all duration-300 view flex-row gap-2 z-5 flex justify-center items-center text-white/80 text-2xl lg:text-xl"
       >
-        فروشگاه{" "}
+        فروشگاه
         <svg
           className="rotate-180"
           width="29"

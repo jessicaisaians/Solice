@@ -16,7 +16,7 @@ const Index: FC<IndexProps> = ({ children }) => {
   return (
     <main className="min-h-[1200px] relative">
       <Navbar />
-
+      <HamburgerMenu />
       <Cursor />
       <LocomotiveScrollProviderClient
         props={{
@@ -35,7 +35,6 @@ const Index: FC<IndexProps> = ({ children }) => {
       >
         <div className="App" data-scroll-container ref={containerRef}>
           {children}
-          <HamburgerMenu />
           {/* <StickyScroll /> */}
           {/* <Collections />*/}
         </div>

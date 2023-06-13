@@ -23,9 +23,14 @@ const ImageComponent: FC<ImageComponentProps> = ({
   return (
     <Image
       data-scroll
-      data-scroll-speed={scrollSpeed ?? "0.1"}
-      data-scroll-delay={scrollDelay ?? "0.1"}
-      className={clsx("header_img", className)}
+      data-scroll-position="bottom"
+      data-scroll-speed={"1.7"}
+      data-scroll-delay={"0.5"}
+      className={clsx(
+        "header_img",
+        className,
+        "absolute object-cover opacity-1 scale-1 rotate-0 inset-0 w-full h-full translate-x-0 translate-y-0"
+      )}
       src={src}
       width="500"
       height="500"

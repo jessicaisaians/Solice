@@ -185,7 +185,7 @@ const HamburgerMenu: FC<HamburgerMenuProps> = ({}) => {
       </div>
       <div
         onClick={handleToggleMenu}
-        className="cursor-scale flex flex-col lg:hidden gap-[6px] fixed top-[24px] h-[45px] items-center justify-center right-[54px] w-6"
+        className="cursor-scale flex flex-col lg:hidden gap-[6px] absolute top-3 h-[45px] items-center justify-center right-10 w-6"
         style={{ zIndex: 9999 }}
       >
         <span className="menu_bar_1 bg-white relative rounded-3xl h-[0.16rem] w-full"></span>

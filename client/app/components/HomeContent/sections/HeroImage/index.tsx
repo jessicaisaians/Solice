@@ -8,7 +8,7 @@ interface IndexProps {}
 
 const Index: FC<IndexProps> = ({}) => {
   return (
-    <section className="header_container flex flex-col">
+    <section className="header_container flex flex-col justify-center items-center pb-4 w-full relative overflow-hidden py-0 px-[5%] pt-[8vh] md:pt-[13vh] lg:pt-[15vh] mb-[25vh]">
       <BrandSlogan />
       <TransitioningImages />
       <CTA />
