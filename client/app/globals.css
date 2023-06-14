@@ -243,3 +243,88 @@ body {
 }
 
 /* End of Navbar */
+.btn-more-area {
+  translate: none;
+  rotate: none;
+  scale: none;
+  transform: translate(0px, 0px);
+  display: inline-block;
+  padding: 2.1rem 0;
+}
+.btn-more {
+  align-items: center;
+  border: 1px solid #b9b9bf;
+  border-radius: 47px;
+  display: inline-flex;
+  padding: 13px 32px 13px;
+  pointer-events: bounding-box;
+  position: relative;
+}
+.btn-more::before {
+  bottom: -40px;
+  content: "";
+  display: block;
+  left: -40px;
+  position: absolute;
+  right: -40px;
+  top: -40px;
+}
+.btn-more-title {
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  position: relative;
+  top: -1px;
+  z-index: 2;
+}
+.btn-more-txt {
+  /* color: rgb(0,0,0); */
+  /* transform: translate(0%, 130%) skew(0deg, -3deg); */
+  color: rgb(255, 255, 255);
+  transform: translate(0px, 0px);
+  translate: none;
+  rotate: none;
+  scale: none;
+  transform-origin: 0% 0%;
+}
+.btn-more-txt::after {
+  content: attr(data-text);
+  display: block;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 150%;
+  -webkit-transform: skewY(3deg);
+  transform: skewY(3deg);
+}
+.btn-more-ripple {
+  border-radius: inherit;
+  bottom: 0;
+  display: block;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  z-index: 1;
+  pointer-events: none;
+}
+.btn-more-ripple-inner {
+  translate: none;
+  rotate: none;
+  scale: none;
+  /* border-radius: 0%;
+  transform: translate(0%, 0%); */
+  border-radius: 50%;
+  transform: translate(0%, 100%);
+  background-color: rgb(255, 255, 255);
+  opacity: 1;
+  visibility: inherit;
+  background: #fff;
+  display: block;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+}
+/* Collections Button More  */

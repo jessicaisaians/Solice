@@ -36,7 +36,6 @@ const Index: FC<IndexProps> = ({ children }) => {
         <div className="App" data-scroll-container ref={containerRef}>
           {children}
           {/* <StickyScroll /> */}
-          {/* <Collections />*/}
         </div>
       </LocomotiveScrollProviderClient>
       <Footer />

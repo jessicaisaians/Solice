@@ -14,48 +14,60 @@ export const initCustomCursor = () => {
     if (isTouchDevice) {
       // Add a CSS class to hide the cursor on touch devices
       cursor.classList.add("hide-cursor");
-    }
-    document.addEventListener("mousemove", (e) => {
-      gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.2,
-        ease: "power2.out",
-      });
-    });
-    const links = document.querySelectorAll("a");
-    const shouldScale = document.querySelectorAll(".cursor-scale");
-    const cursorText: HTMLDivElement | null =
-      document.querySelector(".cursor-text");
-
-    const onMouseEnterLink = (e: any) => {
-      const link = e.target;
-      if (link.classList.contains("view")) {
-        gsap.to(cursor, {
-          scale: 4,
-          ease: "power2.out",
+    } else {
+      gsap.set(".custom-cursor", { xPercent: -50, yPercent: -50 });
+      let xTo = gsap.quickTo(".custom-cursor", "x", {
           duration: 0.2,
+          ease: "power3",
+        }),
+        yTo = gsap.quickTo(".custom-cursor", "y", {
+          duration: 0.2,
+          ease: "power3",
         });
-        if (cursorText) {
-          cursorText.style.display = "block";
-        }
-      } else {
-        gsap.to(cursor, { scale: 4, ease: "power2.out", duration: 0.2 });
-      }
-    };
+      window.addEventListener("mousemove", (e) => {
+        xTo(e.clientX);
+        yTo(e.clientY);
+        // gsap.to(cursor, {
+        //   x: e.clientX,
+        //   y: e.clientY,
+        //   duration: 0.2,
+        //   ease: "power2.out",
+        // });
+      });
+      const links = document.querySelectorAll("a");
+      const shouldScale = document.querySelectorAll(".cursor-scale");
+      const cursorText: HTMLDivElement | null =
+        document.querySelector(".cursor-text");
 
-    const onMouseLeaveLink = (e: any) => {
-      gsap.to(cursor, { scale: 1, duration: 0.2, ease: "power2.out" });
-      if (cursorText) cursorText.style.display = "none";
-    };
-    links.forEach((link) => {
-      link.addEventListener("mouseenter", onMouseEnterLink);
-      link.addEventListener("mouseleave", onMouseLeaveLink);
-    });
-    shouldScale.forEach((link) => {
-      link.addEventListener("mouseenter", onMouseEnterLink);
-      link.addEventListener("mouseleave", onMouseLeaveLink);
-    });
+      const onMouseEnterLink = (e: any) => {
+        const link = e.target;
+        if (link.classList.contains("view")) {
+          gsap.to(cursor, {
+            scale: 4,
+            ease: "power2.out",
+            duration: 0.2,
+          });
+          if (cursorText) {
+            cursorText.style.display = "block";
+          }
+        } else {
+          gsap.to(cursor, { scale: 4, ease: "power2.out", duration: 0.2 });
+        }
+      };
+
+      const onMouseLeaveLink = (e: any) => {
+        gsap.to(cursor, { scale: 1, duration: 0.2, ease: "power2.out" });
+        if (cursorText) cursorText.style.display = "none";
+      };
+      links.forEach((link) => {
+        link.addEventListener("mouseenter", onMouseEnterLink);
+        link.addEventListener("mouseleave", onMouseLeaveLink);
+      });
+      shouldScale.forEach((link) => {
+        link.addEventListener("mouseenter", onMouseEnterLink);
+        link.addEventListener("mouseleave", onMouseLeaveLink);
+      });
+    }
   }
 };
 const Cursor: FC<CursorProps> = ({}) => {

@@ -66,3 +66,14 @@ export const unSkewImg = (
   }
   return tl;
 };
+
+
+export const getRelativeCoordinates = (
+  event: any,
+  referenceElement: any
+): { x: number; y: number } => {
+  const { width, height, left, top } = referenceElement.getBoundingClientRect(); // gives you width, height, left-X,top-y of the button
+  const x = event.clientX - left - width / 2;
+  const y = event.clientY - top - height / 2;
+  return { x: x * 0.2, y: y * 0.1 };
+};

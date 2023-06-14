@@ -23,8 +23,8 @@ const ImageComponent: FC<ImageComponentProps> = ({
   return (
     <Image
       data-scroll
-      data-scroll-position="bottom"
-      data-scroll-speed={"1.7"}
+      data-scroll-position="top"
+      data-scroll-speed={"0.1"}
       data-scroll-delay={"0.5"}
       className={clsx(
         "header_img",
