@@ -17,7 +17,7 @@ export const initCustomCursor = () => {
     } else {
       gsap.set(".custom-cursor", { xPercent: -50, yPercent: -50 });
       let xTo = gsap.quickTo(".custom-cursor", "x", {
-          duration: 0.2,
+          duration: 0.4,
           ease: "power3",
         }),
         yTo = gsap.quickTo(".custom-cursor", "y", {

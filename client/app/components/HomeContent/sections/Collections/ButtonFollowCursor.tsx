@@ -10,12 +10,18 @@ interface ButtonFollowCursorProps {
   btnText?: string;
   link: string;
   classNamePostFix: string;
+  txtColor?: string;
+  bgColor?: string;
+  padding?: string;
 }
 
 const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
   btnText = "مشاهده",
   link,
   classNamePostFix,
+  txtColor,
+  bgColor,
+  padding,
 }) => {
   const router = useRouter();
   const parallaxIt = (e: any, className: string, reverse?: boolean) => {
@@ -37,7 +43,7 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
       parallaxIt(e, `.btn-more-area_${classNamePostFix}`)
     );
     gsap.to(`.btn-more-txt_${classNamePostFix}`, {
-      color: "rgb(0,0,0)",
+      color: txtColor ?? "rgb(0,0,0)",
       transform: "translate(0%, 130%) skew(0deg, -3deg)",
       duration: 0.2,
       ease: "out",
@@ -64,7 +70,7 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
       ease: "out",
     });
     gsap.to(`.btn-more-txt_${classNamePostFix}`, {
-      color: "rgb(255,255,255)",
+      color: txtColor ?? "rgb(255,255,255)",
       transform: "translate(0px, 0px)",
       duration: 0.2,
       ease: "out",
@@ -85,20 +91,25 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
         onClick={() => router.push(link)}
         className={clsx(
           `btn-more-bound_${classNamePostFix}`,
-          "btn-more-bound w-[160px] h-[100px] opacity-1 bg-red-200 z-40 opacity-0 absolute"
+          "btn-more-bound w-[160px] h-[100px] opacity-1 z-40 opacity-0 absolute"
         )}
       ></div>
       <div
-        className={clsx(`btn-more-area_${classNamePostFix}`, "btn-more-area")}
+        className={clsx(`btn-more-area_${classNamePostFix}`, "btn-more-area ")}
       >
         <Link
           href={link}
-          className={clsx(`btn-more_${classNamePostFix}`, "btn-more")}
+          className={clsx(`btn-more_${classNamePostFix}`, "btn-more ")}
+          style={{
+            backgroundColor: bgColor ?? "none",
+            padding: padding ?? "13px 32px 13px",
+            borderColor: bgColor ?? "white",
+          }}
         >
           <span
             className={clsx(
               `btn-more-title_${classNamePostFix}`,
-              "btn-more-title"
+              "btn-more-title "
             )}
           >
             <span
@@ -106,6 +117,9 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
                 `btn-more-txt_${classNamePostFix}`,
                 "btn-more-txt"
               )}
+              style={{
+                color: txtColor ?? "#fff",
+              }}
               data-text={btnText}
             >
               {btnText}

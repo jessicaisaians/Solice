@@ -4,7 +4,6 @@ import Cursor from "../Cursor";
 import HamburgerMenu from "../HamburgerMenu";
 import LocomotiveScrollProviderClient from "../LocomotiveScrollProviderClient";
 import Navbar from "../Navbar";
-import Footer from "./sections/Footer";
 
 interface IndexProps {
   children: any;
@@ -18,9 +17,13 @@ const Index: FC<IndexProps> = ({ children }) => {
       <Navbar />
       <HamburgerMenu />
       <Cursor />
+
       <LocomotiveScrollProviderClient
         props={{
           options: {
+            lerp: 0.03, // Linear Interpolation, 0 > 1 // Try 0.01
+            multiplier: 1.4, // Effect Multiplier,
+            touchMultiplier: 2.1,
             smooth: true,
             smartphone: {
               smooth: true,
@@ -38,7 +41,6 @@ const Index: FC<IndexProps> = ({ children }) => {
           {/* <StickyScroll /> */}
         </div>
       </LocomotiveScrollProviderClient>
-      <Footer />
     </main>
   );
 };

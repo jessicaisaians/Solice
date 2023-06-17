@@ -16,7 +16,7 @@
   height: 12px;
   border-radius: 50%;
   z-index: 9998;
-  padding: 9px;
+  padding: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -256,7 +256,7 @@ body {
   border: 1px solid #b9b9bf;
   border-radius: 47px;
   display: inline-flex;
-  padding: 13px 32px 13px;
+
   pointer-events: bounding-box;
   position: relative;
 }
@@ -280,7 +280,7 @@ body {
 .btn-more-txt {
   /* color: rgb(0,0,0); */
   /* transform: translate(0%, 130%) skew(0deg, -3deg); */
-  color: rgb(255, 255, 255);
+  /* color: rgb(255, 255, 255); */
   transform: translate(0px, 0px);
   translate: none;
   rotate: none;
@@ -306,7 +306,6 @@ body {
   position: absolute;
   right: 0;
   top: 0;
-
   z-index: 1;
   pointer-events: none;
 }
@@ -328,3 +327,39 @@ body {
   pointer-events: none;
 }
 /* Collections Button More  */
+/* footer */
+.footer_sec {
+  height: 200vh;
+  margin-top: -105vh;
+  /* padding: 100vh 0 1.64rem; */
+
+  bottom: 0;
+  max-width: 100%;
+  width: 100%;
+  z-index: 1;
+  margin: auto;
+}
+.footer_trigger {
+  opacity: 1;
+  visibility: inherit;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.footer {
+  opacity: 0;
+  visibility: hidden;
+  /* background-image: linear-gradient(180deg, rgb(82 82 82), rgb(38 38 38)); */
+  border-radius: 10px 10px 0 0;
+  background-image: linear-gradient(180deg, #5a81a2, #1f3d61);
+  height: 100vh;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  z-index: -1;
+}

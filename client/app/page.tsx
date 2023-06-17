@@ -1,4 +1,4 @@
-import Collections from "./components/HomeContent/sections/Collections/collections";
+import Collections from "./components/HomeContent/sections/Collections/Collections";
 import HeroImage from "./components/HomeContent/sections/Hero/index";
 
 export default function Home() {
@@ -6,7 +6,9 @@ export default function Home() {
     <>
       <HeroImage />
       <Collections />
-      <section className="h-[200vh] w-full bg-blue-50"></section>
+      <section className="h-[100vh] w-full ">
+        <p className="text-white"> helloo this is Jessica isk what im doing</p>
+      </section>
     </>
   );
 }

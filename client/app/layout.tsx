@@ -2,6 +2,7 @@ import clsx from "clsx";
 import "locomotive-scroll/dist/locomotive-scroll.css";
 import localFont from "next/font/local";
 import HomeContent from "./components/HomeContent";
+import Footer from "./components/HomeContent/sections/Footer";
 import "./globals.css";
 const myFont = localFont({ src: "./../public/iran-sans.ttf" });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={clsx(myFont.className, "bg-stone-950")}>
         <HomeContent>
           {children}
+          <Footer />
         </HomeContent>
       </body>
     </html>

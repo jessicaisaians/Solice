@@ -18,9 +18,12 @@ const SectionImg: FC<SectionImgProps> = ({
   clipPath,
 }) => {
   return (
-    <Link className="animated_img" href={`/#c${index}`}>
+    <Link
+      className="animated_img rounded-[2rem] lg:rounded-none overflow-hidden lg:overflow-auto w-full lg:w-auto h-[calc(100vw-(5vw*2))]"
+      href={`/#c${index}`}
+    >
       <div
-        className={`animated_img_${index + 1}`}
+        className={`animated_img_${index + 1} relative lg:absolute`}
         style={{
           zIndex,
           background: `url('${bgUrl}')`,
@@ -28,7 +31,6 @@ const SectionImg: FC<SectionImgProps> = ({
           clipPath: clipPath,
           backgroundRepeat: "no-repeat",
           width: "100%",
-          position: "absolute",
           height: "100%",
           cursor: "none",
           backgroundSize: "cover",

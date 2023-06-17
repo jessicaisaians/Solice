@@ -19,13 +19,20 @@ const SectionText: FC<SectionTextProps> = ({
   isFake,
 }) => {
   return (
-    <div className={clsx(isFake ? "fake_txt" : "", "header_container  w-[11.8rem]")}>
-      <div className="flex flex-col items-start h-[100vh] justify-center ml-auto mr-[25.2px] mt-[0px] static text-left w-full">
-        <span className="mb-1 text-stone-400 text-sm">
+    <div
+      className={clsx(
+        isFake ? "fake_txt" : "",
+        "header_container  w-full lg:w-[11.8rem] select-none"
+      )}
+    >
+      <div className="flex flex-col items-center lg:items-start h-auto lg:h-[100vh] justify-center lg:ml-auto  mx:0 lg:mr-[25.2px] my-16 lg:my-[0px] static text-left w-full">
+        <span className="mb-1 text-stone-400 text-sm hidden lg-block">
           {index < 10 ? `0${index}` : index}
         </span>
-        <h4 className="text-white text-2xl">{name}</h4>
-        <div className="opacity-1  scale-1 rotate-0 translate-0 transform-none -mb-[40px] -mt-[11px] pb-0 text-center">
+        <h4 className="text-white lg:text-2xl text-3xl mb-3 lg:mb-none">
+          {name}
+        </h4>
+        <div className="opacity-1  scale-1 rotate-0 translate-0 transform-none -mb-[40px] -mt-[11px] pb-0 text-center lg:text-base text-xl">
           <ButtonFollowCursor link={link} classNamePostFix={classNamePostFix} />
         </div>
       </div>

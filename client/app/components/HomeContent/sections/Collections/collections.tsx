@@ -1,4 +1,5 @@
 "use client";
+import useWindowSize from "@/app/hooks/useWindowSize";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FC, useLayoutEffect, useRef } from "react";
@@ -8,16 +9,15 @@ import SectionText from "./SectionText";
 
 gsap.registerPlugin(ScrollTrigger);
 interface CollectionsProps {}
-
+// 1024 remove animation on smaller than 1024
 const Collections: FC<CollectionsProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
-
+  const { height, width } = useWindowSize();
   const ref = useRef(null);
   var tl: ReturnType<typeof gsap.timeline> | undefined;
-
   useLayoutEffect(() => {
     let ctx: any;
-    if (scroll) {
+    if (scroll && width && width >= 1024) {
       const element = scroll?.el;
       scroll.on("scroll", ScrollTrigger.update);
 
@@ -85,7 +85,7 @@ const Collections: FC<CollectionsProps> = ({}) => {
       );
     }
     return () => ctx && ctx.revert();
-  }, [scroll]);
+  }, [scroll, width]);
   const collections = [
     {
       slug: "patchwork",
@@ -107,61 +107,89 @@ const Collections: FC<CollectionsProps> = ({}) => {
     },
   ];
   return (
-    // 360vh for 3 images
-    // *0.74% for 3 images
-    <section className={`flex static px-[5.4rem] `}>
-      <div
-        className="h-full overflow-hidden static w-1/2 z-10"
-        data-scroll
-        id="i1"
-        ref={ref}
-      >
-        <div className="h-full static w-full">
-          {collections.map((collection, index) => (
-            <SectionText
-              key={collection.id + "_collection"}
-              classNamePostFix={index.toString()}
-              index={index + 1}
-              link={`/collections/${collection.slug}`}
-              name={collection.name}
-            />
-          ))}
-          <SectionText
-            key={"all_collections"}
-            classNamePostFix={(collections.length + 1).toString()}
-            index={0}
-            link={`/collections`}
-            name={"مشاهده همه"}
-          />
-        </div>
-      </div>
-      <div className="content-center items-center box-border flex float-none h-screen right-1/2 overflow-visible absolute w-1/2 p-0">
+    <>
+      <section className={`lg:flex static px-[5%] hidden  select-none`}>
         <div
+          className="h-full overflow-hidden static w-1/2 z-10"
           data-scroll
-          // data-scroll-sticky
-          data-scroll-target="#i1"
-          data-scroll-offset="0%,%45"
-          style={{
-            zIndex: 100,
-          }}
-          id="trigger"
-          className="relative rounded-[11%] flex h-96 w-96 overflow-hidden "
+          id="i1"
+          ref={ref}
         >
-          {collections.map((collection, index) => (
-            <SectionImg
-              key={collection.id + "_image"}
-              bgPosition={index === 0 ? "0px 50%" : "0px 35%"}
-              bgUrl={collection.img}
-              clipPath={
-                index === collections.length - 1 ? "none" : "inset(0px)"
-              }
-              index={index}
-              zIndex={collections.length - index}
+          <div className="h-full static w-full">
+            {collections.map((collection, index) => (
+              <SectionText
+                key={collection.id + "_collection"}
+                classNamePostFix={index.toString()}
+                index={index + 1}
+                link={`/collections/${collection.slug}`}
+                name={collection.name}
+              />
+            ))}
+            <SectionText
+              key={"all_collections"}
+              classNamePostFix={(collections.length + 1).toString()}
+              index={0}
+              link={`/collections`}
+              name={"مشاهده همه"}
             />
-          ))}
+          </div>
         </div>
-      </div>
-    </section>
+        <div className="content-center items-center box-border flex float-none h-screen right-1/2 overflow-visible absolute w-1/2 p-0">
+          <div
+            data-scroll
+            // data-scroll-sticky
+            data-scroll-target="#i1"
+            data-scroll-offset="0%,%45"
+            style={{
+              zIndex: 100,
+            }}
+            id="trigger"
+            className="relative rounded-[11%] flex h-96 w-96 overflow-hidden "
+          >
+            {collections.map((collection, index) => (
+              <SectionImg
+                key={collection.id + "_image"}
+                bgPosition={index === 0 ? "0px 50%" : "0px 35%"}
+                bgUrl={collection.img}
+                clipPath={
+                  index === collections.length - 1 ? "none" : "inset(0px)"
+                }
+                index={index}
+                zIndex={collections.length - index}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+      <section
+        className={`lg:hidden static px-[5%] flex flex-col  select-none`}
+      >
+        {collections.map((collection, index) => (
+          <div
+            key={`collection_${collection.id}`}
+            className="flex flex-col my-6"
+          >
+            <div className="flex flex-col">
+              <SectionImg
+                key={collection.id + "_image"}
+                bgPosition={"0px 0"}
+                bgUrl={collection.img}
+                clipPath={"none"}
+                index={index}
+                zIndex={collections.length - index}
+              />
+              <SectionText
+                key={collection.id + "_collection"}
+                classNamePostFix={index.toString()}
+                index={index + 1}
+                link={`/collections/${collection.slug}`}
+                name={collection.name}
+              />
+            </div>
+          </div>
+        ))}
+      </section>
+    </>
   );
 };
 export default Collections;
