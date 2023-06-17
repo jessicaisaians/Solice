@@ -58,9 +58,9 @@ const Index: FC<IndexProps> = ({}) => {
     };
   }, [scroll]);
   return (
-    <div className="h-fit w-full" ref={ref}>
+    <div className="services_trigger h-fit w-full mb-[30vh]  lg:mb-[50vh]" ref={ref}>
       <div className="container flex justify-between items-start w-full max-w-full whitespace-pre-wrap">
-        <div className="text-[40px] w-full max-w-full whitespace-pre-wrap ">
+        <div className="text-4xl w-full max-w-full whitespace-pre-wrap ">
           <p className="text-p max-w-full w-full m-auto text-center">
             استایل منحصر به فرد با سولیس
           </p>

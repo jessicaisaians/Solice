@@ -1,14 +1,17 @@
+import Index from "./components/HomeContent/sections/Collections";
 import Collections from "./components/HomeContent/sections/Collections/Collections";
 import HeroImage from "./components/HomeContent/sections/Hero/index";
+import Services from "./components/HomeContent/sections/Services";
+import StickyScroll from "./components/HomeContent/sections/StickyScroll/index";
 
 export default function Home() {
   return (
     <>
       <HeroImage />
       <Collections />
-      <section className="h-[100vh] w-full ">
-        <p className="text-white"> helloo this is Jessica isk what im doing</p>
-      </section>
+      <Index />
+      <StickyScroll />
+      <Services />
     </>
   );
 }

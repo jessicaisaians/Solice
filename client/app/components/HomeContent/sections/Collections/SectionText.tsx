@@ -22,10 +22,10 @@ const SectionText: FC<SectionTextProps> = ({
     <div
       className={clsx(
         isFake ? "fake_txt" : "",
-        "header_container  w-full lg:w-[11.8rem] select-none"
+        "header_container  w-full select-none"
       )}
     >
-      <div className="flex flex-col items-center lg:items-start h-auto lg:h-[100vh] justify-center lg:ml-auto  mx:0 lg:mr-[25.2px] my-16 lg:my-[0px] static text-left w-full">
+      <div className="flex flex-col items-center lg:items-start h-auto lg:h-[100vh] justify-center lg:ml-auto  mx:0 lg:mr-[30%] my-16 lg:my-[0px] static text-left w-full">
         <span className="mb-1 text-stone-400 text-sm hidden lg-block">
           {index < 10 ? `0${index}` : index}
         </span>

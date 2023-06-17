@@ -38,9 +38,9 @@ const Index: FC<IndexProps> = ({}) => {
       gsap.to(".footer", {
         scrollTrigger: {
           trigger: ".footer_trigger",
-          start: "top top",
+          start: "top 80vh",
           endTrigger: ".end_trigger",
-          end: "top top",
+          end: "end bottom",
           scroller: scroll?.el,
           toggleActions: "play none none reverse",
         },
@@ -61,7 +61,7 @@ const Index: FC<IndexProps> = ({}) => {
       // className="h-[200vh] -mt-[105vh] min-h-[594px] pt-[110vh] px-[28px] pb-[17.64rem] bottom-0 max-w-full w-full z-10"
     >
       <div
-        className="footer_trigger relative visible opacity-1 w-full"
+        className="footer_trigger  relative visible opacity-1 w-full"
         // className="trigger relative opacity-1 visible h-full w-full flex flex-col justify-between"
       >
         <div
@@ -72,7 +72,7 @@ const Index: FC<IndexProps> = ({}) => {
           // className="footer opacity-0 invisible h-screen left-0 w-screen top-0 -z-10 absolute bg-gradient-to-b from-[#5a81a2]  to-[#1f3d61]"
         ></div>
         <Menu />
-        <MenuMobile/>
+        <MenuMobile />
       </div>
     </section>
   );

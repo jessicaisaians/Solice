@@ -49,7 +49,7 @@ const Navbar: FC<NavbarProps> = ({}) => {
     }
   }, [activeBoxWidth, pathname, onlyWidth]);
   return (
-    <nav className="navigation w-5/6 sm:w-2/3 hidden lg:block ">
+    <nav className="navigation w-5/6 sm:w-2/3 hidden lg:block opacity-90 ">
       <ul className="nav_link_list">
         <li
           className={clsx(

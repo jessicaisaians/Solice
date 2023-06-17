@@ -152,11 +152,7 @@ body {
 .text-p {
   -webkit-background-clip: text !important;
   background-clip: text !important;
-  background: linear-gradient(
-    to right,
-    rgb(37, 37, 37) 50%,
-    rgb(255, 255, 255) 50%
-  );
+  background: linear-gradient(to right, rgb(37, 37, 37) 50%, #d6d3d1 50%);
 
   color: transparent;
   padding: 50px 54px;
