@@ -2,27 +2,31 @@
 import Link from "next/link";
 import { FC } from "react";
 import ButtonFollowCursor from "../Collections/ButtonFollowCursor";
-interface MenuProps {}
+interface MenuProps {
+  menuOnly?: boolean;
+}
 
-const Menu: FC<MenuProps> = ({}) => {
+const Menu: FC<MenuProps> = ({ menuOnly }) => {
   return (
     <div className="flex-col hidden lg:flex ">
       <div className="gap-32  flex-wrap flex flex-col justify-between z-40 text-white absolute bottom-10 right-[5.4rem] left-[5.4rem]">
-        <div className="flex flex-col items-center ">
-          <h6 className="text-white text-4xl leading-[3.6rem] text-center">
-            همین حالا <span className="text-[#b3dfff]">ثبت‌نام</span> کنید!
-          </h6>
-          <div className="end_trigger  opacity-1 z-20 scale-1 rotate-0 translate-0 transform-none pb-0 text-center lg:text-base text-xl">
-            <ButtonFollowCursor
-              classNamePostFix="create_account"
-              txtColor="#3d7299"
-              bgColor="#fff"
-              padding="16px 32px 16px"
-              link="/register"
-              btnText="ایجاد حساب کاربری"
-            />
+        {!menuOnly && (
+          <div className="flex flex-col items-center ">
+            <h6 className="text-white text-4xl leading-[3.6rem] text-center">
+              همین حالا <span className="text-[#b3dfff]">ثبت‌نام</span> کنید!
+            </h6>
+            <div className="end_trigger  opacity-1 z-20 scale-1 rotate-0 translate-0 transform-none pb-0 text-center lg:text-base text-xl">
+              <ButtonFollowCursor
+                classNamePostFix="create_account"
+                txtColor="#3d7299"
+                bgColor="#fff"
+                padding="16px 32px 16px"
+                link="/register"
+                btnText="ایجاد حساب کاربری"
+              />
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex-wrap flex  justify-between z-40 text-white relative  w-full">
           <ul className="flex flex-col gap-4 text-[13px]">
             <li>

@@ -2,7 +2,7 @@
 import useWindowSize from "@/app/hooks/useWindowSize";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { FC, useLayoutEffect, useRef } from "react";
+import { FC, useLayoutEffect, useMemo, useRef } from "react";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 import SectionImg from "./SectionImg";
 import SectionText from "./SectionText";
@@ -12,9 +12,33 @@ interface CollectionsProps {}
 // 1024 remove animation on smaller than 1024
 const Collections: FC<CollectionsProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
+
   const { height, width } = useWindowSize();
   const ref = useRef(null);
-  var tl: ReturnType<typeof gsap.timeline> | undefined;
+  const collections = useMemo(
+    () => [
+      {
+        slug: "patchwork",
+        name: "کالکشن موزائیک",
+        img: "/images/collection_patchwork_1.jpg",
+        id: 1,
+      },
+      {
+        slug: "denim",
+        img: "/images/collection_linen_5.jpg",
+        name: "کالکشن جین",
+        id: 2,
+      },
+      {
+        slug: "suit",
+        img: "/images/collection_coat_2.jpg",
+        name: "کالکشن کت",
+        id: 3,
+      },
+    ],
+    []
+  );
+
   useLayoutEffect(() => {
     let ctx: any;
     if (scroll && width && width >= 1024) {
@@ -38,7 +62,7 @@ const Collections: FC<CollectionsProps> = ({}) => {
         pinType: element.style.transform ? "transform" : "fixed",
       });
       ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      tl = gsap.timeline({
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: "#trigger",
           start: "center center",
@@ -48,6 +72,7 @@ const Collections: FC<CollectionsProps> = ({}) => {
           // "+=" + ((ref?.current as any)?.clientHeight - window.innerHeight),
           scrub: true,
           pin: true,
+          immediateRender: false,
         },
         defaults: { ease: "none" },
       });
@@ -74,38 +99,10 @@ const Collections: FC<CollectionsProps> = ({}) => {
               index * baseDuration
             );
       });
-      tl!.to(
-        `.fake_txt`,
-        {
-          transform: "translateX(100px)",
-          // ease: "ease",
-          duration: baseDuration,
-        },
-        collections.length * baseDuration
-      );
     }
     return () => ctx && ctx.revert();
-  }, [scroll, width]);
-  const collections = [
-    {
-      slug: "patchwork",
-      name: "کالکشن موزائیک",
-      img: "/images/collection_patchwork_1.jpg",
-      id: 1,
-    },
-    {
-      slug: "denim",
-      img: "/images/collection_linen_5.jpg",
-      name: "کالکشن جین",
-      id: 2,
-    },
-    {
-      slug: "suit",
-      img: "/images/collection_coat_2.jpg",
-      name: "کالکشن کت",
-      id: 3,
-    },
-  ];
+  }, [scroll, width, collections]);
+
   return (
     <>
       <section className={`lg:flex static px-[5%] hidden  select-none`}>

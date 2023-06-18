@@ -22,6 +22,7 @@ export const skewImg = (
   let repeatDelay = stagger * (noOfImages - 1) + pause;
   tl = gsap.timeline({
     repeat: -1,
+    immediateRender: false,
   });
 
   tl.from(images, {
@@ -39,6 +40,7 @@ export const skewImg = (
       duration: duration,
       opacity: 0,
       transform: "scale(1.3) skew(0deg, 3deg)",
+      immediateRender: false,
       stagger: {
         each: stagger,
         repeat: -1,
@@ -61,12 +63,12 @@ export const unSkewImg = (
       gsap.to(image, {
         opacity: 1,
         transform: "translate(0px, 0px)",
+        immediateRender: false,
       })
     );
   }
   return tl;
 };
-
 
 export const getRelativeCoordinates = (
   event: any,

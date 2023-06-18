@@ -8,10 +8,8 @@ import MenuMobile from "./MenuMobile";
 interface IndexProps {}
 gsap.registerPlugin(ScrollTrigger);
 const Index: FC<IndexProps> = ({}) => {
-  var tl: ReturnType<typeof gsap.timeline> | undefined;
   const { scroll } = useLocomotiveScroll();
   const ref = useRef(null);
-  var tl: ReturnType<typeof gsap.timeline> | undefined;
   useLayoutEffect(() => {
     let ctx: any;
     if (scroll) {
@@ -39,9 +37,11 @@ const Index: FC<IndexProps> = ({}) => {
         scrollTrigger: {
           trigger: ".footer_trigger",
           start: "top 80vh",
-          endTrigger: ".end_trigger",
-          end: "end bottom",
+          // endTrigger: ".end_trigger",
+          // end: "end bottom",
           scroller: scroll?.el,
+          immediateRender: false,
+
           toggleActions: "play none none reverse",
         },
         opacity: 1,
@@ -54,6 +54,7 @@ const Index: FC<IndexProps> = ({}) => {
   }, [scroll]);
   return (
     // linear-gradient(180deg,#5a81a2,#1f3d61)
+
     <section
       id="bab"
       ref={ref}

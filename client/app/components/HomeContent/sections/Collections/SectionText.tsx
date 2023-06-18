@@ -7,7 +7,6 @@ interface SectionTextProps {
   index: number;
   name: string;
   link: string;
-  isFake?: boolean;
   classNamePostFix: string;
 }
 
@@ -16,15 +15,9 @@ const SectionText: FC<SectionTextProps> = ({
   index,
   link,
   name,
-  isFake,
 }) => {
   return (
-    <div
-      className={clsx(
-        isFake ? "fake_txt" : "",
-        "header_container  w-full select-none"
-      )}
-    >
+    <div className={clsx("header_container  w-full select-none")}>
       <div className="flex flex-col items-center lg:items-start h-auto lg:h-[100vh] justify-center lg:ml-auto  mx:0 lg:mr-[30%] my-16 lg:my-[0px] static text-left w-full">
         <span className="mb-1 text-stone-400 text-sm hidden lg-block">
           {index < 10 ? `0${index}` : index}

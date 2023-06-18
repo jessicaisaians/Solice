@@ -20,8 +20,9 @@ export const ScrollableImage = ({
     <Image
       className="w-auto h-[400px] rounded-3xl"
       src={src}
-      width={400}
-      height={400}
+      width={0}
+      sizes="100vw"
+      height={0}
       alt="image"
     />
   </div>
@@ -29,6 +30,7 @@ export const ScrollableImage = ({
 const Index: React.FC<IndexProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
   const ref = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const { height, width } = useWindowSize();
   const [isSmallerThanM, setIsSmallerThanM] = useState<boolean>(false);
   useEffect(() => {
@@ -72,6 +74,7 @@ const Index: React.FC<IndexProps> = ({}) => {
             end: () => "+=" + ref.current!.scrollWidth,
             // end: () => "+=" + ref.current!.offsetWidth,
             scrub: isSmallerThanM ? 0.2 : 0.6,
+            immediateRender: false,
 
             // markers: true,
             pin: ref.current,

@@ -3,27 +3,31 @@ import Link from "next/link";
 import { FC } from "react";
 import ButtonFollowCursor from "../Collections/ButtonFollowCursor";
 
-interface MenuMobileProps {}
+interface MenuMobileProps {
+  menuOnly?: boolean;
+}
 
-const MenuMobile: FC<MenuMobileProps> = ({}) => {
+const MenuMobile: FC<MenuMobileProps> = ({ menuOnly }) => {
   return (
     <div className="flex-col lg:hidden flex">
       <div className="flex-wrap flex flex-col justify-between z-40 text-white absolute bottom-10 right-[45px] left-[45px]">
-        <div className="flex flex-col items-center mb-14 ">
-          <h6 className="text-white text-4xl leading-[3.6rem] text-center">
-            همین حالا <span className="text-[#b3dfff]">ثبت‌نام</span> کنید!
-          </h6>
-          <div className="w-full opacity-1 z-20 scale-1 rotate-0 translate-0 transform-none pb-0 text-center lg:text-base text-xl">
-            <ButtonFollowCursor
-              classNamePostFix="create_account"
-              txtColor="#3d7299"
-              bgColor="#fff"
-              padding="16px 32px 16px"
-              link="/register"
-              btnText="ایجاد حساب کاربری"
-            />
+        {!menuOnly && (
+          <div className="flex flex-col items-center mb-14 ">
+            <h6 className="text-white text-4xl leading-[3.6rem] text-center">
+              همین حالا <span className="text-[#b3dfff]">ثبت‌نام</span> کنید!
+            </h6>
+            <div className="w-full opacity-1 z-20 scale-1 rotate-0 translate-0 transform-none pb-0 text-center lg:text-base text-xl">
+              <ButtonFollowCursor
+                classNamePostFix="create_account"
+                txtColor="#3d7299"
+                bgColor="#fff"
+                padding="16px 32px 16px"
+                link="/register"
+                btnText="ایجاد حساب کاربری"
+              />
+            </div>
           </div>
-        </div>
+        )}
         <ul className="flex flex-col items-center  gap-4 text-xl text-center mb-10">
           <li className="underline underline-offset-8  tracking-wider">
             info@solice.com
