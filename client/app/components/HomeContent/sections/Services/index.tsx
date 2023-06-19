@@ -24,7 +24,6 @@ const Services: FC<ServicesProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    let ctx: gsap.Context | undefined;
     if (scroll) {
       const element = scroll?.el;
       scroll.on("scroll", ScrollTrigger.update);
@@ -46,25 +45,27 @@ const Services: FC<ServicesProps> = ({}) => {
         pinType: element.style.transform ? "transform" : "fixed",
       });
       ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      gsap.to(".service", {
-        duration: 3, // Adjust the duration to make it slower
-        opacity: 1,
-        transform: "translateX(0)",
-        stagger: 3,
-        ease: "slow(1, 1, false)", // Adjust the ease to control the speed
-        scrollTrigger: {
-          scroller: scroll?.el,
-          trigger: ".services_trigger",
-          scrub: 1,
-          start: "top top",
-        },
+      let ctx = gsap.context(() => {
+        gsap.to(".service", {
+          duration: 3, // Adjust the duration to make it slower
+          opacity: 1,
+          transform: "translateX(0)",
+          stagger: 3,
+          ease: "slow(1, 1, false)", // Adjust the ease to control the speed
+          scrollTrigger: {
+            scroller: scroll?.el,
+            trigger: ".services_trigger",
+            scrub: 1,
+            start: "top top",
+          },
+        });
       });
       ScrollTrigger.refresh();
+      return () => {
+        ctx && ctx.revert();
+        ScrollTrigger.removeEventListener("refresh", () => ctx && ctx.revert());
+      };
     }
-    return () => {
-      ctx && ctx.revert();
-      ScrollTrigger.removeEventListener("refresh", () => ctx && ctx.revert());
-    };
   }, [scroll]);
   return (
     <section className="services_container flex flex-col gap-10  h-[90vh] sm:h-[80vh] md:h-[90vh] lg:h-[80vh] items-center w-[90%] lg:w-1/2 left-1/2 -translate-x-1/2 mt-10 absolute bottom-[130vh] lg:bottom-[160vh]">

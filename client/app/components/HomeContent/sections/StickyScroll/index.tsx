@@ -12,7 +12,6 @@ const Index: FC<IndexProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    let ctx: gsap.Context | undefined;
     if (scroll) {
       const element = scroll?.el;
       scroll.on("scroll", ScrollTrigger.update);
@@ -34,7 +33,8 @@ const Index: FC<IndexProps> = ({}) => {
         pinType: element.style.transform ? "transform" : "fixed",
       });
       ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      ctx = gsap.context(() => {
+
+      let ctx = gsap.context(() => {
         gsap.to(".text-p", {
           backgroundPositionX: "100%",
           duration: 2, // Adjust the duration to make it slower
@@ -51,15 +51,15 @@ const Index: FC<IndexProps> = ({}) => {
         });
         ScrollTrigger.refresh();
       }, ref);
+      return () => {
+        ctx && ctx.revert();
+        ScrollTrigger.removeEventListener("refresh", () => ctx && ctx.revert());
+      };
     }
-    return () => {
-      ctx && ctx.revert();
-      ScrollTrigger.removeEventListener("refresh", () => ctx && ctx.revert());
-    };
   }, [scroll]);
   return (
     <div
-      className="services_trigger h-fit w-full mb-[30vh]  lg:mb-[50vh]"
+      className="services_trigger h-fit w-full mb-[30vh]  lg:mb-[50vh] lg:mt-[50vh]"
       ref={ref}
     >
       <div className="container flex justify-between items-start w-full max-w-full whitespace-pre-wrap">

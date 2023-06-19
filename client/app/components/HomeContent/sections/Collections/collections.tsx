@@ -40,7 +40,6 @@ const Collections: FC<CollectionsProps> = ({}) => {
   );
 
   useLayoutEffect(() => {
-    let ctx: any;
     if (scroll && width && width >= 1024) {
       const element = scroll?.el;
       scroll.on("scroll", ScrollTrigger.update);
@@ -62,50 +61,52 @@ const Collections: FC<CollectionsProps> = ({}) => {
         pinType: element.style.transform ? "transform" : "fixed",
       });
       ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#trigger",
-          start: "center center",
-          scroller: scroll?.el,
-          // makes the height of the scrolling (while pinning) match the width, thus the speed remains constant (vertical/horizontal)
-          end: () => "+=" + (ref?.current as any)?.clientHeight,
-          // "+=" + ((ref?.current as any)?.clientHeight - window.innerHeight),
-          scrub: true,
-          pin: true,
-          immediateRender: false,
-        },
-        defaults: { ease: "none" },
+      let ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#trigger",
+            start: "center center",
+            scroller: scroll?.el,
+            // makes the height of the scrolling (while pinning) match the width, thus the speed remains constant (vertical/horizontal)
+            end: () => "+=" + (ref?.current as any)?.clientHeight,
+            // "+=" + ((ref?.current as any)?.clientHeight - window.innerHeight),
+            scrub: true,
+            pin: true,
+            immediateRender: false,
+          },
+          defaults: { ease: "none" },
+        });
+        const baseDuration = 0.2;
+        collections.forEach((_, index) => {
+          index === collections.length - 1
+            ? tl!.to(
+                `.animated_img_${index + 1}`,
+                {
+                  backgroundPosition: "0px 50%",
+                  opacity: "0",
+                  ease: "ease",
+                  duration: 0.4,
+                },
+                index * baseDuration
+              )
+            : tl!.to(
+                `.animated_img_${index + 1}`,
+                {
+                  backgroundPosition: "0px 65%",
+                  clipPath: "inset(0px 0px 100%)",
+                  duration: baseDuration,
+                },
+                index * baseDuration
+              );
+        });
       });
-      const baseDuration = 1.4;
-      collections.forEach((_, index) => {
-        index === collections.length - 1
-          ? tl!.to(
-              `.animated_img_${index + 1}`,
-              {
-                backgroundPosition: "0px 50%",
-                opacity: "0",
-                // ease: "ease",
-                duration: baseDuration,
-              },
-              index * baseDuration
-            )
-          : tl!.to(
-              `.animated_img_${index + 1}`,
-              {
-                backgroundPosition: "0px 65%",
-                clipPath: "inset(0px 0px 100%)",
-                duration: baseDuration,
-              },
-              index * baseDuration
-            );
-      });
+      return () => ctx && ctx.revert();
     }
-    return () => ctx && ctx.revert();
   }, [scroll, width, collections]);
 
   return (
     <>
-      <section className={`lg:flex static px-[5%] hidden  select-none`}>
+      <section className={`lg:flex static px-[5%] hidden select-none`}>
         <div
           className="h-full overflow-hidden static w-1/2 z-10"
           data-scroll

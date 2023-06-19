@@ -11,7 +11,6 @@ const Index: FC<IndexProps> = ({}) => {
   const { scroll } = useLocomotiveScroll();
   const ref = useRef(null);
   useLayoutEffect(() => {
-    let ctx: any;
     if (scroll) {
       const element = scroll?.el;
       scroll.on("scroll", ScrollTrigger.update);
@@ -33,24 +32,26 @@ const Index: FC<IndexProps> = ({}) => {
         pinType: element.style.transform ? "transform" : "fixed",
       });
       ScrollTrigger.addEventListener("refresh", () => scroll?.update());
-      gsap.to(".footer", {
-        scrollTrigger: {
-          trigger: ".footer_trigger",
-          start: "top 80vh",
-          // endTrigger: ".end_trigger",
-          // end: "end bottom",
-          scroller: scroll?.el,
-          immediateRender: false,
+      let ctx = gsap.context(() => {
+        gsap.to(".footer", {
+          scrollTrigger: {
+            trigger: ".footer_trigger",
+            start: "top 80vh",
+            // endTrigger: ".end_trigger",
+            // end: "end bottom",
+            scroller: scroll?.el,
+            immediateRender: false,
 
-          toggleActions: "play none none reverse",
-        },
-        opacity: 1,
-        visibility: "inherit",
-        duration: 1.2,
-        ease: "power4.easeIn",
+            toggleActions: "play none none reverse",
+          },
+          opacity: 1,
+          visibility: "inherit",
+          duration: 1.2,
+          ease: "power4.easeIn",
+        });
       });
+      return () => ctx && ctx.revert();
     }
-    return () => ctx && ctx.revert();
   }, [scroll]);
   return (
     // linear-gradient(180deg,#5a81a2,#1f3d61)

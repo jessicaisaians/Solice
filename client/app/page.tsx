@@ -1,5 +1,5 @@
 // import Index from "./components/HomeContent/sections/Collections";
-import Collections from "./components/HomeContent/sections/Collections/Collections";
+import Collections from "./components/HomeContent/sections/Collections/collections";
 import Footer from "./components/HomeContent/sections/Footer";
 import HeroImage from "./components/HomeContent/sections/Hero/index";
 import Services from "./components/HomeContent/sections/Services";

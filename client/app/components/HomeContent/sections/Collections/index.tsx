@@ -91,8 +91,11 @@ const Index: React.FC<IndexProps> = ({}) => {
   }, [scroll, isSmallerThanM]);
 
   return (
-    <div className="text-white bg-neutral-900 py-[42px] lg:pt-[30vh] lg:pb-[10vh] my-10">
-      <div className="quotes-wrapper" ref={ref}>
+    <div
+      data-scroll-section
+      className="text-white bg-neutral-900 py-[42px] lg:pt-[30vh] lg:pb-[10vh] my-10"
+    >
+      <div ref={ref}>
         <div className="flex">
           {[...Array(6)].map((item, index) => (
             <ScrollableImage

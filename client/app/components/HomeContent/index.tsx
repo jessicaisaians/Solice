@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import { FC, useRef } from "react";
 import Cursor from "../Cursor";
 import HamburgerMenu from "../HamburgerMenu";
@@ -11,6 +12,7 @@ interface IndexProps {
 
 const Index: FC<IndexProps> = ({ children }) => {
   const containerRef = useRef<null | HTMLDivElement>(null);
+  const pathname = usePathname(); // With next/router
 
   return (
     <main className="min-h-[1200px] relative">
@@ -32,8 +34,12 @@ const Index: FC<IndexProps> = ({ children }) => {
               smooth: true,
             },
           },
+          location: pathname,
           watch: [],
           containerRef: containerRef,
+          onLocationChange: (scroll) =>
+            scroll.scrollTo(0, { duration: 0, disableLerp: true }),
+          onUpdate: () => console.log("Updated, but not on location change!"), // Will trigger on
         }}
       >
         <div className="App" data-scroll-container ref={containerRef}>
