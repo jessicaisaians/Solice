@@ -1,7 +1,6 @@
 "use client";
 import clsx from "clsx";
 import { gsap } from "gsap";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FC } from "react";
 import { getRelativeCoordinates } from "../Hero/gsapFunctions";
@@ -13,6 +12,8 @@ interface ButtonFollowCursorProps {
   txtColor?: string;
   bgColor?: string;
   padding?: string;
+  onClick?: () => any;
+  type?: "submit" | "reset" | "button" | undefined;
 }
 
 const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
@@ -22,6 +23,8 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
   txtColor,
   bgColor,
   padding,
+  type,
+  onClick,
 }) => {
   const router = useRouter();
   const parallaxIt = (e: any, className: string, reverse?: boolean) => {
@@ -88,7 +91,10 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
       <div
         onMouseLeave={handleMouseOut}
         onMouseEnter={handleMouseOver}
-        onClick={() => router.push(link)}
+        onClick={() => {
+          if (type === "submit") return;
+          onClick ? onClick() : router.push(link);
+        }}
         className={clsx(
           `btn-more-bound_${classNamePostFix}`,
           "btn-more-bound w-[160px] h-[100px] opacity-1 z-40 opacity-0 absolute"
@@ -97,8 +103,12 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
       <div
         className={clsx(`btn-more-area_${classNamePostFix}`, "btn-more-area ")}
       >
-        <Link
-          href={link}
+        <button
+          type={type ?? "button"}
+          onClick={() => {
+            if (type === "submit") return;
+            onClick ? onClick() : router.push(link);
+          }}
           className={clsx(`btn-more_${classNamePostFix}`, "btn-more ")}
           style={{
             backgroundColor: bgColor ?? "none",
@@ -138,7 +148,7 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
               )}
             />
           </span>
-        </Link>
+        </button>
       </div>
     </>
   );
