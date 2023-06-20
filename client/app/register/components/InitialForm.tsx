@@ -28,36 +28,28 @@ const InitialForm: FC<InitialFormProps> = ({
   }, [currFormValues, reset]);
 
   const onSubmit: SubmitHandler<any> = ({ mobile }) => {
+    const isLogin = true;
     setComponentToRender(
       <MobileValidation
         setComponentToRender={setComponentToRender}
         currFormValues={{ mobile }}
+        isLogin={isLogin}
       />
     );
   };
   return (
     <>
-      <div className="mb-7 text-center pt-0  ">
+      <div className="mb-12 text-center pt-0  ">
         <h1 className=" text-3xl font-bold text-white text-center   ">
-          ثبت‌نام
+          ورود | ثبت‌نام 
         </h1>
-        <div className="my-4 text-stone-400 text-base  text-center">
-          حساب کاربری دارید؟
-          <span className="mr-3">
-            <Link
-              href={"/login"}
-              className="text-stone-500 border-b-2 text-base  border-stone-400 "
-            >
-              ورود
-            </Link>
-          </span>
-        </div>
+      
       </div>
       <form
         className="flex flex-col gap-5 relative min-w-[350px]"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="relative z-0 w-full mb-6 group">
+        <div className="relative z-0 w-full mb-3 group">
           <input
             autoFocus
             id="mobile"
@@ -92,7 +84,7 @@ const InitialForm: FC<InitialFormProps> = ({
             txtColor="#1c1917"
             classNamePostFix="register"
             link="/"
-            btnText="ثبت‌نام"
+            btnText="ادامه"
             type="submit"
             onClick={handleSubmit(onSubmit)}
           />

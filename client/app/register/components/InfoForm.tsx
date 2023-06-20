@@ -445,7 +445,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             txtColor="#1c1917"
             classNamePostFix="register"
             link="/"
-            btnText="ثبت‌نام"
+            btnText="ادامه"
             type="submit"
             onClick={handleSubmit(onSubmit)}
           />

@@ -44,7 +44,10 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s !important;
   -webkit-text-fill-color: rgb(214 211 209) !important;
 }
-
+input:-internal-autofill-selected {
+    transition: background-color 5000s ease-in-out 0s !important;
+   -webkit-text-fill-color: rgb(214 211 209) !important;
+}
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
