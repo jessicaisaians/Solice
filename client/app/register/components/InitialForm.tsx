@@ -22,9 +22,11 @@ const InitialForm: FC<InitialFormProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   useEffect(() => {
     reset(currFormValues);
   }, [currFormValues, reset]);
+
   const onSubmit: SubmitHandler<any> = ({ mobile }) => {
     setComponentToRender(
       <MobileValidation
@@ -57,12 +59,15 @@ const InitialForm: FC<InitialFormProps> = ({
       >
         <div className="relative z-0 w-full mb-6 group">
           <input
-          autoFocus
+            autoFocus
             id="mobile"
             className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
             placeholder=" "
             {...register("mobile", {
-              required: "وارد کردن شماره موبایل الزامی می‌باشد",
+              required: {
+                value: true,
+                message: "وارد کردن شماره موبایل الزامی می‌باشد",
+              },
               pattern: {
                 value: /^(0|0098|\+98)9(0[1-5]|[1 3]\d|2[0-2]|98)\d{7}$/,
                 message: "شماره موبایل وارد شده نامعتبر می‌باشد.",
@@ -76,7 +81,7 @@ const InitialForm: FC<InitialFormProps> = ({
             شماره موبایل
           </label>
           {errors.mobile && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
+            <p role="alert" className="text-yellow-600  mt-4 text-xs">
               {errors.mobile.message?.toString()}
             </p>
           )}

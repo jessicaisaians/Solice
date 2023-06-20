@@ -30,7 +30,15 @@ const MobileValidation: FC<MobileValidationProps> = ({
         else {
           setErr("");
           //   login
-          setComponentToRender(<InfoForm />);
+          // check if its register or login
+          const isLogin = true;
+          // check if has password
+          const hasPassword = false;
+          if (!isLogin || (isLogin && !hasPassword))
+            setComponentToRender(<InfoForm />);
+          else {
+            //log the user in  and navigate to callbackURL
+          }
         }
       }
     } catch (err: any) {
@@ -86,7 +94,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
       <form onSubmit={handleVerifyCode}>
         <OTPInput otp={otp} setOTP={setOTP} />
         {err && (
-          <p role="alert" className="text-red-700 mt-4 text-xs">
+          <p role="alert" className="text-yellow-600  mt-4 text-xs">
             {err}
           </p>
         )}

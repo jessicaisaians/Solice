@@ -52,18 +52,17 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
       (year > 0 || month > 0 || day > 0) &&
       !isValidDate({ y: year, m: month, d: day })
     ) {
-      setBirthDateErr("تاریخ نامعتبر");
+      return setBirthDateErr("تاریخ نامعتبر");
     } else {
       setBirthDateErr("");
     }
     if (confPassword !== password)
-      setError("confPassword", {
+      return setError("confPassword", {
         type: "custom",
         message: "رمز عبور و تکرار رمز عبور باید یکسان باشند",
       });
 
-    setFocus("confPassword");
-    alert(gender);
+    //log the user in  and navigate to callbackURL
   };
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
@@ -91,7 +90,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
       value.length <= 2 ? parseInt(value) : parseInt(value.slice(-2));
     const min = 1;
     const max = 12;
-
+    if (valInt === 0) return setMonth(valInt);
     if (valInt > max) return setMonth(max);
     if (valInt < min) return setMonth(min);
     else setMonth(valInt);
@@ -100,8 +99,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
     const value = e.target.value;
     const valInt =
       value.length <= 2 ? parseInt(value) : parseInt(value.slice(-2));
+
     const min = 1;
     const max = 31;
+    if (valInt === 0) return setDay(valInt);
     if (valInt > max) return setDay(max);
     if (valInt < min) return setDay(min);
     else setDay(valInt);
@@ -141,15 +142,6 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             />
             خانم
           </label>
-          {/* <label htmlFor="field-sun">
-            <input
-              {...register("gender")}
-              type="radio"
-              value="sun"
-              id="field-sun"
-            />
-            Sunny
-          </label> */}
         </div>
         <div className="relative z-0 w-full mb-6 group">
           <input
@@ -174,7 +166,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             نام
           </label>
           {errors.fName && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
+            <p role="alert" className="text-yellow-600 mt-4 text-xs">
               {errors.fName.message?.toString()}
             </p>
           )}
@@ -203,7 +195,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             نام خانوادگی
           </label>
           {errors.lName && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
+            <p role="alert" className="text-yellow-600  mt-4 text-xs">
               {errors.lName.message?.toString()}
             </p>
           )}
@@ -227,10 +219,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             <p>آدرس ایمیل</p>
-            <FaAsterisk className="fill-red-800 h-2" />
+            <FaAsterisk className="text-yellow-800  h-2" />
           </label>
           {errors.email && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
+            <p role="alert" className="text-yellow-600  mt-4 text-xs">
               {errors.email.message?.toString()}
             </p>
           )}
@@ -271,13 +263,13 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               htmlFor="password"
               className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              <p>رمز عبور</p> <FaAsterisk className="fill-red-800 h-2" />
+              <p>رمز عبور</p> <FaAsterisk className="text-yellow-800  h-2" />
             </label>
           </div>
           {errors.password && (
             <p
               role="alert"
-              className="text-red-700 mt-4 text-xs max-w-[350px]  leading-6"
+              className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
             >
               {errors.password.message?.toString()}
             </p>
@@ -318,13 +310,14 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               htmlFor="confPassword"
               className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              <p>تکرار رمز عبور</p> <FaAsterisk className="fill-red-800 h-2" />
+              <p>تکرار رمز عبور</p>{" "}
+              <FaAsterisk className="text-yellow-800  h-2" />
             </label>
           </div>
           {errors.confPassword && (
             <p
               role="alert"
-              className="text-red-700 mt-4 text-xs max-w-[350px]  leading-6"
+              className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
             >
               {errors.confPassword.message?.toString()}
             </p>
@@ -350,7 +343,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             کد معرف
           </label>
           {errors.promoCode && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
+            <p role="alert" className="text-yellow-600  mt-4 text-xs">
               {errors.promoCode.message?.toString()}
             </p>
           )}
@@ -366,10 +359,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             </label>
             <input
               id="day"
-              //   max={31}
-              //   min={1}
-              //   maxLength={2}
-              //   minLength={2}
+              max={31}
+              min={0}
+              maxLength={2}
+              minLength={1}
               type="number"
               onChange={handleOnDayChange}
               value={day}
@@ -389,10 +382,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             </label>
             <input
               type="number"
-              //   min={1}
-              //   max={12}
-              //   maxLength={2}
-              //   minLength={2}
+              min={0}
+              max={12}
+              maxLength={2}
+              minLength={1}
               value={month}
               onChange={handleOnMonthChange}
               style={{
@@ -410,12 +403,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               سال
             </label>
             <input
-              //   ref={activeOtpIndex === index ? inputRef : null}
-              //   key={index}
-              //   maxLength={4}
-              //   minLength={4}
-              //   max={parseInt(moment().locale("fa").format("YYYY"))}
-              //   min={parseInt(moment().locale("fa").format("YYYY")) - 100}
+              maxLength={4}
+              minLength={1}
+              max={parseInt(moment().locale("fa").format("YYYY"))}
+              min={parseInt(moment().locale("fa").format("YYYY")) - 100}
               type="number"
               value={year}
               onChange={handleOnChangeYear}
@@ -444,7 +435,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
         </div>
         <p
           role="alert"
-          className="text-red-700  h-8 mb-1 text-xs max-w-[350px]  leading-6"
+          className="text-yellow-600   h-8 mb-1 text-xs max-w-[350px]  leading-6"
         >
           {birthDateErr}
         </p>
