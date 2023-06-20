@@ -2,6 +2,7 @@
 import ButtonFollowCursor from "@/app/components/HomeContent/sections/Collections/ButtonFollowCursor";
 import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
 import { FiEdit } from "react-icons/fi";
+import InfoForm from "./InfoForm";
 import InitialForm, { FormValues } from "./InitialForm";
 import OTPInput from "./OTPInput";
 import Timer from "./Timer";
@@ -28,7 +29,8 @@ const MobileValidation: FC<MobileValidationProps> = ({
         if (code !== currCode) throw new Error("کد وارد شده نامعتبر می‌باشد");
         else {
           setErr("");
-          alert("good job");
+          //   login
+          setComponentToRender(<InfoForm />);
         }
       }
     } catch (err: any) {

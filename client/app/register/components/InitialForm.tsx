@@ -11,7 +11,6 @@ export interface InitialFormProps {
 }
 export type FormValues = {
   mobile: string;
-  email: string;
 };
 const InitialForm: FC<InitialFormProps> = ({
   setComponentToRender,
@@ -26,11 +25,11 @@ const InitialForm: FC<InitialFormProps> = ({
   useEffect(() => {
     reset(currFormValues);
   }, [currFormValues, reset]);
-  const onSubmit: SubmitHandler<any> = ({ email, mobile }) => {
+  const onSubmit: SubmitHandler<any> = ({ mobile }) => {
     setComponentToRender(
       <MobileValidation
         setComponentToRender={setComponentToRender}
-        currFormValues={{ email, mobile }}
+        currFormValues={{ mobile }}
       />
     );
   };
@@ -58,31 +57,7 @@ const InitialForm: FC<InitialFormProps> = ({
       >
         <div className="relative z-0 w-full mb-6 group">
           <input
-            id="email"
-            className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
-            placeholder=" "
-            {...register("email", {
-              required: "وارد کردن آدرس ایمیل الزامی می‌باشد",
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: "آدرس ایمیل وارد شده نامعتبر می‌باشد.",
-              },
-            })}
-          />
-          <label
-            htmlFor="email"
-            className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-          >
-            آدرس ایمیل
-          </label>
-          {errors.email && (
-            <p role="alert" className="text-red-700 mt-4 text-xs">
-              {errors.email.message?.toString()}
-            </p>
-          )}
-        </div>
-        <div className="relative z-0 w-full mb-6 group">
-          <input
+          autoFocus
             id="mobile"
             className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
             placeholder=" "

@@ -1,3 +1,5 @@
+import moment from "jalali-moment";
+
 export const calculateDuration = (
   startTimestamp: number,
   endTimestamp: number
@@ -18,3 +20,40 @@ export const calculateDuration = (
 
   return duration;
 };
+
+export const isValidDate = ({
+  y,
+  m,
+  d,
+}: {
+  y: number;
+  m: number;
+  d: number;
+}): boolean => moment(`${y}/${m}/${d}`, "YYYY/MM/DD").isValid();
+
+export const convertYYYYMMDDToEpoch = ({
+  y,
+  m,
+  d,
+}: {
+  y: number;
+  m: number;
+  d: number;
+}) => moment.from(`${y}/${m}/${d}`, "fa", "YYYY/MM/DD").locale("fa").valueOf();
+export const calcAgeFromYYYMMDD = ({
+  y,
+  m,
+  d,
+}: {
+  y: number;
+  m: number;
+  d: number;
+}): number => {
+  if (isValidDate({ y, m, d })) {
+    const birthDate = convertYYYYMMDDToEpoch({ y, m, d });
+    return moment().diff(birthDate, "years");
+  } else return -1;
+};
+
+export const numberInRange = (num: number, min: number, max: number): boolean =>
+  num >= min && num <= max;

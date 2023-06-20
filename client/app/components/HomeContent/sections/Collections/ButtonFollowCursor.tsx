@@ -92,7 +92,7 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
         onMouseLeave={handleMouseOut}
         onMouseEnter={handleMouseOver}
         onClick={() => {
-          if (type === "submit") return;
+          if (type === "submit" && !onClick) return;
           onClick ? onClick() : router.push(link);
         }}
         className={clsx(
@@ -106,8 +106,8 @@ const ButtonFollowCursor: FC<ButtonFollowCursorProps> = ({
         <button
           type={type ?? "button"}
           onClick={() => {
-            if (type === "submit") return;
-            onClick ? onClick() : router.push(link);
+            if (type === "submit" && !onClick) return;
+            onClick ? null : router.push(link);
           }}
           className={clsx(`btn-more_${classNamePostFix}`, "btn-more ")}
           style={{
