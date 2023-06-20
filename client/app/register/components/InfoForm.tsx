@@ -10,6 +10,7 @@ import moment from "jalali-moment";
 import { ChangeEvent, FC, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { FaAsterisk } from "react-icons/fa";
 enum GenderEnum {
   female = "female",
   male = "male",
@@ -223,9 +224,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
           />
           <label
             htmlFor="email"
-            className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
-            آدرس ایمیل
+            <p>آدرس ایمیل</p>
+            <FaAsterisk className="fill-red-800 h-2" />
           </label>
           {errors.email && (
             <p role="alert" className="text-red-700 mt-4 text-xs">
@@ -267,9 +269,9 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             )}
             <label
               htmlFor="password"
-              className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              رمز عبور
+              <p>رمز عبور</p> <FaAsterisk className="fill-red-800 h-2" />
             </label>
           </div>
           {errors.password && (
@@ -314,9 +316,9 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             )}
             <label
               htmlFor="confPassword"
-              className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              تکرار رمز عبور
+              <p>تکرار رمز عبور</p> <FaAsterisk className="fill-red-800 h-2" />
             </label>
           </div>
           {errors.confPassword && (
@@ -440,12 +442,12 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             )}
           </p>
         </div>
-            <p
-                role="alert"
-                className="text-red-700  h-8 mb-1 text-xs max-w-[350px]  leading-6"
-            >
-                {birthDateErr}
-            </p>
+        <p
+          role="alert"
+          className="text-red-700  h-8 mb-1 text-xs max-w-[350px]  leading-6"
+        >
+          {birthDateErr}
+        </p>
         <div className="opacity-1 scale-1 rotate-0 translate-0 transform-none -mb-[40px] -mt-[11px] pb-0 text-center lg:text-base text-xl">
           <ButtonFollowCursor
             bgColor="#a8a29e"

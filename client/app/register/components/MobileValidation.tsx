@@ -90,7 +90,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
             {err}
           </p>
         )}
-        <div className="opacity-1 scale-1 rotate-0 translate-0 transform-none -mb-[40px] -mt-[14px] pb-0 text-center lg:text-base text-xl">
+        <div className="opacity-1 scale-1 rotate-0 translate-0 transform-none -mb-[40px] -mt-[16px] pb-0 text-center lg:text-base text-xl">
           <ButtonFollowCursor
             bgColor="#a8a29e"
             txtColor="#1c1917"
