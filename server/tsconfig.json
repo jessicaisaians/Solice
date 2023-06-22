@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "rootDirs": ["src"],
+    "target": "ES2022",
+    "types": ["node"],
+    "lib": ["dom", "es6", "ES2022", "esnext.asynciterable"],
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "removeComments": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "maxNodeModuleJsDepth": 15,
+    "baseUrl": ".",
+    "allowJs": true,
+    "typeRoots": ["./node_modules/@types", "./typing-stubs"]
+  },
+
+  "exclude": ["node_modules"],
+  "include": [
+    "./src/**/*.ts",
+    "src/utils/handleTokens.ts",
+    "src/middleware/UserAuth.ts",
+    "src/vendor/html-pdf/lib/pdf_a4_portrait.js",
+    "src/vendor/html-pdf/lib/index.js",
+    "src/vendor/html-pdf/lib/pdf.js"
+  ]
+}
