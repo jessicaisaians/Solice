@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import express from "express";
 import kave from "kavenegar";
 import NodeCache from "node-cache";
 import { Field, ObjectType } from "type-graphql";
@@ -15,6 +16,8 @@ export interface GraphQLContext {
   prisma: PrismaClient;
   myCache: NodeCache;
   kaveApi: kave.kavenegar.KavenegarInstance;
+  req: express.Request;
+  res: express.Response;
 }
 
 export interface Session {

@@ -31,6 +31,22 @@ export const isValidDate = ({
   d: number;
 }): boolean => moment(`${y}/${m}/${d}`, "YYYY/MM/DD").isValid();
 
+export const convertYYYYMMDDToDate = ({
+  y,
+  m,
+  d,
+}: {
+  y: number;
+  m: number;
+  d: number;
+}): Date =>
+  new Date(
+    moment
+      .from(`${y}/${m}/${d}`, "fa", "YYYY/MM/DD")
+      .locale("en")
+      .format("YYYY/MM/DD")
+  );
+
 export const convertYYYYMMDDToEpoch = ({
   y,
   m,

@@ -2,7 +2,7 @@
 import ButtonFollowCursor from "@/app/components/HomeContent/sections/Collections/ButtonFollowCursor";
 import {
   calcAgeFromYYYMMDD,
-  convertYYYYMMDDToEpoch,
+  convertYYYYMMDDToDate,
   isValidDate,
   numberInRange,
 } from "@/app/utils";
@@ -12,14 +12,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaAsterisk } from "react-icons/fa";
 enum GenderEnum {
-  female = "female",
-  male = "male",
-  other = "other",
+  FEMALE = "female",
+  MALE = "male",
 }
 interface InfoFormProps {}
 interface FormValues {
   fName: string;
   lName: string;
+  username: string;
   email: string;
   gender: GenderEnum;
   password: string;
@@ -42,12 +42,14 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
     fName,
     gender,
     lName,
+    username,
     confPassword,
     password,
     promoCode,
     email,
   }) => {
-    const birthDateMs = convertYYYYMMDDToEpoch({ y: year, m: month, d: day });
+    const birthDateMs = convertYYYYMMDDToDate({ y: year, m: month, d: day });
+    alert(birthDateMs);
     if (
       (year > 0 || month > 0 || day > 0) &&
       !isValidDate({ y: year, m: month, d: day })
@@ -126,7 +128,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               checked
               {...register("gender")}
               type="radio"
-              value={GenderEnum.male}
+              value={GenderEnum.MALE}
               id="field-male"
               className="accent-blue-300 focus:accent-blue-400 ml-3"
             />
@@ -136,7 +138,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             <input
               {...register("gender")}
               type="radio"
-              value={GenderEnum.female}
+              value={GenderEnum.FEMALE}
               id="field-female"
               className="accent-blue-300 focus:accent-blue-400 ml-3"
             />
@@ -180,7 +182,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               pattern: {
                 value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
 
-                message: "نام حانواردگی وارد شده نامعتبر می‌باشد.",
+                message: "نام خانوادگی وارد شده نامعتبر می‌باشد.",
               },
               maxLength: {
                 message: "نام خانوادگی نمی‌تواند بیشتر از 20 کاراکتر باشد.",
@@ -197,6 +199,38 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
           {errors.lName && (
             <p role="alert" className="text-yellow-600  mt-4 text-xs">
               {errors.lName.message?.toString()}
+            </p>
+          )}
+        </div>
+        <div className="relative z-0 w-full mb-6 group">
+          <input
+            id="username"
+            className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
+            placeholder=" "
+            {...register("username", {
+              pattern: {
+                value: /^(?=.*[A-Za-z])[A-Za-z0-9_.]{1,30}$/,
+                message: "نام کاربری وارد شده نامعتبر می‌باشد.",
+              },
+              // maxLength: {
+              //   message: "نام کاربری نمی‌تواند بیشتر از 20 کاراکتر باشد.",
+              //   value: 30,
+              // },
+              // minLength: {
+              //   message: "نام کاربری نمی‌تواند کمتر از 3 کاراکتر باشد.",
+              //   value: 1,
+              // },
+            })}
+          />
+          <label
+            htmlFor="username"
+            className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            نام کاربری
+          </label>
+          {errors.username && (
+            <p role="alert" className="text-yellow-600  mt-4 text-xs">
+              {errors.username.message?.toString()}
             </p>
           )}
         </div>
