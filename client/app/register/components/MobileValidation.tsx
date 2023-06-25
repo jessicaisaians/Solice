@@ -1,6 +1,14 @@
 "use client";
 import ButtonFollowCursor from "@/app/components/HomeContent/sections/Collections/ButtonFollowCursor";
+import {
+  useCheckVerificationCodeMutation,
+  usePasswordLoginLazyQuery,
+  useSendVerificationCodeLazyQuery,
+} from "@/generated/graphql";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
+import { toast } from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import InfoForm from "./InfoForm";
@@ -11,65 +19,113 @@ export interface MobileValidationProps {
   setComponentToRender: Dispatch<SetStateAction<any>>;
   currFormValues?: FormValues;
   isLogin: boolean;
+  hasPassword: boolean;
 }
 
 const MobileValidation: FC<MobileValidationProps> = ({
   setComponentToRender,
   currFormValues,
   isLogin,
+  hasPassword,
 }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [otp, setOTP] = useState<string[]>(new Array(4).fill(""));
   const [err, setErr] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [hasTimerEnded, setHasTimerEnded] = useState(false);
   const [usePassword, setUsePassword] = useState(false);
   const [showPasswords, setShowPasswords] = useState<boolean>(false);
-  const handlePasswordLogin = (e?: FormEvent<HTMLFormElement>) => {
+  const [checkCode] = useCheckVerificationCodeMutation();
+  const [passwordLogin] = usePasswordLoginLazyQuery();
+
+  const [_, { loading: sendCodeLoading, refetch }] =
+    useSendVerificationCodeLazyQuery();
+  const handlePasswordLogin = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     //send password to server check if its ok
-
-    const error = "رمز عبور نادرست می‌باشد.";
-    setErr(error);
+    const data = await passwordLogin({
+      variables: {
+        password,
+        mobile: currFormValues?.mobile ?? "",
+      },
+    });
+    if (data.data?.passwordLogin.errors) {
+      setErr(data.data?.passwordLogin?.errors?.[0]?.message);
+    } else {
+      setErr("");
+      const result = await signIn("credentials", {
+        id: data?.data?.passwordLogin?.user?.id,
+        role: data?.data?.passwordLogin?.user?.role,
+        callbackUrl: (searchParams.get("callbackUrl") as string) ?? "/",
+      });
+      if (result?.ok) toast.success("ورود با موفقیت!");
+      else if (result?.error)
+        toast.error(result?.error ?? "مشکلی رخ داده است.");
+    }
   };
   const handleUsePassword = () => {
     setErr("");
     setHasTimerEnded(true);
     setUsePassword((prev) => !prev);
   };
-  const handleVerifyCode = (e?: FormEvent<HTMLFormElement>) => {
+  const handleVerifyCode = async (e?: FormEvent<HTMLFormElement>) => {
     try {
       e?.preventDefault();
-      const code = otp.join("");
-      if (code.length < 4) {
-        throw new Error("وارد کردن کد الزامی می‌باشد.");
+      const data = await checkCode({
+        variables: {
+          code: otp.join(""),
+          mobile: currFormValues?.mobile ?? "",
+        },
+      });
+      if (data.data?.checkVerificationCode.errors) {
+        setErr(data.data?.checkVerificationCode?.errors?.[0]?.message);
       } else {
-        const currCode = "1234";
-        if (code !== currCode) throw new Error("کد وارد شده نامعتبر می‌باشد");
-        else {
-          setErr("");
-          // check if has password
-          const hasPassword = false;
-          if (!isLogin || (isLogin && !hasPassword))
+        setErr("");
+        const result = await signIn("credentials", {
+          id: data?.data?.checkVerificationCode.user?.id,
+          role: data?.data?.checkVerificationCode.user?.role,
+          redirect: false,
+        });
+        const isLogin = data.data?.checkVerificationCode?.isLogin;
+        if (isLogin) {
+          const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+          if (!data.data?.checkVerificationCode?.hasPassword) {
             setComponentToRender(<InfoForm />);
-          else {
-            //log the user in  and navigate to callbackURL
-          }
+          } else router.replace(callbackUrl as string);
+        } else {
+          // navigate to Setup Info compoennet
+          setComponentToRender(<InfoForm />);
         }
+        console.log(result);
       }
     } catch (err: any) {
       setErr(err?.message);
     }
   };
-  const handleResendCode = () => {
-    setHasTimerEnded(false);
+  const handleResendCode = async () => {
+    const data = await refetch({
+      mobile: currFormValues?.mobile ?? "",
+    });
+    if (data?.data?.sendVerificationCode?.success) {
+      setHasTimerEnded(false);
+      setOTP(new Array(4).fill(""));
+      setErr("");
+    } else {
+      setErr(data?.data?.sendVerificationCode?.errors?.[0]?.message ?? "");
+    }
   };
+
+  const loginOrRegisteTxt = isLogin === true ? "ورود" : "ثبت‌نام";
   return (
     <div>
       <div className="mb-7 text-center pt-0  ">
         <h1 className=" text-3xl font-bold text-white text-center   ">
           {isLogin
             ? usePassword
-              ? "ورود با رمز عبور"
-              : "ورود با کد"
+              ? `${loginOrRegisteTxt} با رمز عبور`
+              : `${loginOrRegisteTxt} با کد`
             : "تایید شماره موبایل"}
         </h1>
         <div className="my-5 text-stone-400 text-base flex flex-col text-center">
@@ -118,6 +174,8 @@ const MobileValidation: FC<MobileValidationProps> = ({
             <div className="relative z-0 w-full group">
               <input
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type={showPasswords ? "text" : "password"}
                 className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
                 placeholder=" "
@@ -159,9 +217,10 @@ const MobileValidation: FC<MobileValidationProps> = ({
             link="/"
             btnText={usePassword ? "ورود" : "بررسی کد"}
             type="submit"
+            isLoading={sendCodeLoading}
           />
         </div>
-        {isLogin ? (
+        {isLogin && hasPassword ? (
           <>
             {" "}
             <div className="relative text-white text-center border-t-2 border-stone-800 py-2 mt-8">
@@ -173,7 +232,9 @@ const MobileValidation: FC<MobileValidationProps> = ({
               className="text-center text-sm text-stone-500 py-4 hover:text-stone-400 transition-colors"
               onClick={handleUsePassword}
             >
-              {usePassword ? "ورود با کد" : "ورود را رمز عبور"}
+              {usePassword
+                ? `${loginOrRegisteTxt} با کد`
+                : `${loginOrRegisteTxt} با رمز عبور`}
             </p>
           </>
         ) : null}

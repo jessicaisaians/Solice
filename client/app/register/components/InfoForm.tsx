@@ -6,9 +6,11 @@ import {
   isValidDate,
   numberInRange,
 } from "@/app/utils";
+import { useSetupUserInfoMutation } from "@/generated/graphql";
 import moment from "jalali-moment";
 import { ChangeEvent, FC, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaAsterisk } from "react-icons/fa";
 enum GenderEnum {
@@ -30,15 +32,15 @@ interface FormValues {
 const InfoForm: FC<InfoFormProps> = ({}) => {
   const [birthDateErr, setBirthDateErr] = useState("");
   const [showPasswords, setShowPasswords] = useState<boolean>(false);
+  const [setupInfoMutation, { loading: setupInfoLoading }] =
+    useSetupUserInfoMutation();
   const {
-    reset,
     register,
     handleSubmit,
     setError,
-    setFocus,
     formState: { errors },
   } = useForm();
-  const onSubmit: SubmitHandler<any> = ({
+  const onSubmit: SubmitHandler<any> = async ({
     fName,
     gender,
     lName,
@@ -48,8 +50,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
     promoCode,
     email,
   }) => {
-    const birthDateMs = convertYYYYMMDDToDate({ y: year, m: month, d: day });
-    alert(birthDateMs);
+    const birthday = convertYYYYMMDDToDate({ y: year, m: month, d: day });
     if (
       (year > 0 || month > 0 || day > 0) &&
       !isValidDate({ y: year, m: month, d: day })
@@ -58,13 +59,32 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
     } else {
       setBirthDateErr("");
     }
-    if (confPassword !== password)
-      return setError("confPassword", {
-        type: "custom",
-        message: "رمز عبور و تکرار رمز عبور باید یکسان باشند",
+    const data = await setupInfoMutation({
+      variables: {
+        options: {
+          gender,
+          birthday,
+          confPassword,
+          email,
+          fName,
+          lName,
+          password,
+          promoCode,
+          username,
+        },
+      },
+    });
+    if (data?.data?.setupUserInfo?.errors) {
+      data?.data?.setupUserInfo?.errors?.map((err) => {
+        setError(err.path, {
+          type: "custom",
+          message: err.message,
+        });
       });
-
-    //log the user in  and navigate to callbackURL
+    } else {
+      toast.success("ثبت‌نام با موفقیت!");
+      // navigate to home
+    }
   };
   const [year, setYear] = useState<number>(0);
   const [month, setMonth] = useState<number>(0);
@@ -147,6 +167,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
         </div>
         <div className="relative z-0 w-full mb-6 group">
           <input
+            autoFocus 
             id="fName"
             className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
             placeholder=" "
@@ -154,6 +175,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
               pattern: {
                 value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
                 message: "نام وارد شده نامعتبر می‌باشد.",
+              },
+              minLength: {
+                message: "نام نمی‌تواند کمتر از 3 کاراکتر باشد.",
+                value: 3,
               },
               maxLength: {
                 message: "نام نمی‌تواند بیشتر از 20 کاراکتر باشد.",
@@ -183,6 +208,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
                 value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
 
                 message: "نام خانوادگی وارد شده نامعتبر می‌باشد.",
+              },
+              minLength: {
+                message: "نام خانوادگی نمی‌تواند کمتر از 3 کاراکتر باشد.",
+                value: 3,
               },
               maxLength: {
                 message: "نام خانوادگی نمی‌تواند بیشتر از 20 کاراکتر باشد.",
@@ -438,9 +467,9 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             </label>
             <input
               maxLength={4}
-              minLength={1}
-              max={parseInt(moment().locale("fa").format("YYYY"))}
-              min={parseInt(moment().locale("fa").format("YYYY")) - 100}
+              // minLength={1}
+              // max={parseInt(moment().locale("fa").format("YYYY"))}
+              // min={parseInt(moment().locale("fa").format("YYYY")) - 100}
               type="number"
               value={year}
               onChange={handleOnChangeYear}
@@ -482,6 +511,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             btnText="ادامه"
             type="submit"
             onClick={handleSubmit(onSubmit)}
+            isLoading={setupInfoLoading}
           />
         </div>
       </form>

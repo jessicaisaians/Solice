@@ -1,7 +1,8 @@
 "use client";
-import Link from "next/link";
+import { useSendVerificationCodeLazyQuery } from "@/generated/graphql";
 import { Dispatch, FC, SetStateAction, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import ButtonFollowCursor from "../../components/HomeContent/sections/Collections/ButtonFollowCursor";
 import MobileValidation from "./MobileValidation";
 
@@ -20,30 +21,45 @@ const InitialForm: FC<InitialFormProps> = ({
     reset,
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm();
-
+  const [sendVerificationCode, { loading }] = useSendVerificationCodeLazyQuery({
+    fetchPolicy: "network-only",
+  });
   useEffect(() => {
     reset(currFormValues);
   }, [currFormValues, reset]);
 
-  const onSubmit: SubmitHandler<any> = ({ mobile }) => {
-    const isLogin = true;
-    setComponentToRender(
-      <MobileValidation
-        setComponentToRender={setComponentToRender}
-        currFormValues={{ mobile }}
-        isLogin={isLogin}
-      />
-    );
+  const onSubmit: SubmitHandler<any> = async ({ mobile }) => {
+    const { data } = await sendVerificationCode({
+      variables: {
+        mobile,
+      },
+    });
+    toast.success("کد ارسال شد.");
+    if (data?.sendVerificationCode?.errors) {
+      setError(data?.sendVerificationCode?.errors?.[0]?.path, {
+        type: "custom",
+        message: data?.sendVerificationCode?.errors?.[0]?.message,
+      });
+    } else if (data?.sendVerificationCode?.success) {
+      setComponentToRender(
+        <MobileValidation
+          setComponentToRender={setComponentToRender}
+          currFormValues={{ mobile }}
+          isLogin={data?.sendVerificationCode?.isLogin ?? false}
+          hasPassword={data?.sendVerificationCode?.hasPassword ?? false}
+        />
+      );
+    }
   };
   return (
     <>
       <div className="mb-12 text-center pt-0  ">
         <h1 className=" text-3xl font-bold text-white text-center   ">
-          ورود | ثبت‌نام 
+          ورود | ثبت‌نام
         </h1>
-      
       </div>
       <form
         className="flex flex-col gap-5 relative min-w-[350px]"
@@ -86,6 +102,7 @@ const InitialForm: FC<InitialFormProps> = ({
             link="/"
             btnText="ادامه"
             type="submit"
+            isLoading={loading}
             onClick={handleSubmit(onSubmit)}
           />
         </div>

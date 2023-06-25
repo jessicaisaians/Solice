@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import argon2 from "argon2";
 import {
   Arg,
@@ -18,7 +19,7 @@ import {
 } from "../../utils/types/user";
 import {
   checkVerificationCodeValidator,
-  sendVerificationCodeValidator,
+  mobileValidator,
   setupUserInfoInputSchema,
 } from "../../utils/validators/user";
 
@@ -30,7 +31,7 @@ export class UserResolver {
     @Ctx() { myCache, prisma, kaveApi }: GraphQLContext
   ): Promise<SendVerificationCodeResponse> {
     try {
-      await sendVerificationCodeValidator.validate(
+      await mobileValidator.validate(
         {
           mobile,
         },
@@ -41,7 +42,7 @@ export class UserResolver {
           mobile,
         },
       });
-
+      console.log(userExists);
       const mobileTrimmed = mobile.trim();
       const code = Math.floor(Math.random() * 9000 + 1000).toString();
       const cacheKey = mobileTrimmed;
@@ -64,13 +65,59 @@ export class UserResolver {
       return handleReturnError(err);
     }
   }
+  @Query(() => CheckVerificationCodeResponse)
+  async passwordLogin(
+    @Arg("mobile") mobile: string,
+    @Arg("password") password: string,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<CheckVerificationCodeResponse> {
+    try {
+      await mobileValidator.validate(
+        {
+          mobile,
+        },
+        { abortEarly: false }
+      );
+      const user = await prisma.user.findFirst({
+        where: {
+          mobile,
+          role: Role.USER,
+        },
+      });
+      if (!user) throw new Error("کاربر با این مشخصات یافت نشد.");
+      if (!user.password)
+        throw new Error(
+          "شما برای حساب کاربری خود رمز عبور ایجاد نکرده‌اید. جهت ورود از رمز یکبارمصرف استفاده کنید."
+        );
+      const valid = await argon2.verify(user.password, password);
+      if (!valid)
+        return {
+          success: false,
+          errors: [
+            {
+              path: "password",
+              message: "رمز عبور اشتباه می‌باشد.",
+            },
+          ],
+          isLogin: true,
+          user,
+        };
+      else
+        return {
+          isLogin: true,
+          success: true,
+          user,
+        };
+    } catch (err: any) {
+      return handleReturnError(err);
+    }
+  }
   @Mutation(() => CheckVerificationCodeResponse)
   async checkVerificationCode(
     @Arg("mobile", () => String) mobile: string,
     @Arg("code", () => String) code: string,
     @Ctx() { myCache, prisma }: GraphQLContext
   ): Promise<CheckVerificationCodeResponse> {
-    console.log(code);
     const myCode = code;
     const mob = mobile.trim();
     try {
@@ -87,20 +134,32 @@ export class UserResolver {
       if (myCode !== lastCode) throw new Error("کد وارد شده نامعتبر می‌باشد.");
       else {
         try {
-          await prisma.user.create({
-            data: { mobile },
+          const user = await prisma.user.create({
+            data: { mobile, username: mobile, email: mobile },
           });
           return {
             isLogin: false,
             success: true,
+            user,
+            hasPassword: !!user?.password,
           };
         } catch (err) {
-          if (err.code === "P2002")
+          console.log(err);
+          if (err.code === "P2002") {
+            const user = await prisma.user.findFirst({
+              where: {
+                mobile,
+                role: Role.USER,
+              },
+            });
+            if (!user) throw new Error("کاربر با این مشخصات یافت نشد.");
             return {
               isLogin: true,
               success: true,
+              user: user ?? undefined,
+              hasPassword: !!user?.password,
             };
-          else throw new Error(err);
+          } else throw new Error(err);
         } finally {
           myCache.take(mob);
         }
@@ -126,14 +185,13 @@ export class UserResolver {
         gender,
         username,
       } = options;
-      console.log(gender);
       await setupUserInfoInputSchema.validate(options, {
         abortEarly: false,
       });
 
       const hashedPassword = password ? await argon2.hash(password!) : null;
       try {
-        await prisma.user.update({
+        const user = await prisma.user.update({
           where: {
             id: session?.user?.id,
           },
@@ -150,6 +208,10 @@ export class UserResolver {
         });
         return {
           success: true,
+          user: {
+            id: user.id,
+            role: user.role,
+          },
         };
       } catch (err) {
         if (err.code === "P2002")

@@ -5,7 +5,7 @@ export const strongRegex = new RegExp(
   "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
 );
 const usernameRegex = /^(?=.*[A-Za-z])[A-Za-z0-9_.]{1,30}$/;
-const firstNameRegex = /^[a-zA-Z\u0600-\u06FFs]+$/;
+const firstNameRegex = /^[\u0600-\u06FFa-zA-Z\s]{3,}$/;
 
 export const fieldInvalidMsg = (fieldName: string) =>
   `${fieldName} معتبر نمی باشد.`;
@@ -22,7 +22,7 @@ export const fieldMinMsg = (fieldName: string, min: number) =>
   `طول ${fieldName} باید حداقل ${min} کاراکتر باشد`;
 export const fieldMaxMsg = (fieldName: string, max: number) =>
   `طول ${fieldName} باید حداکثر ${max} کاراکتر باشد`;
-export const sendVerificationCodeValidator = yup.object().shape({
+export const mobileValidator = yup.object().shape({
   mobile: mobValidate,
 });
 export const checkVerificationCodeValidator = yup.object().shape({
@@ -85,7 +85,10 @@ export const setupUserInfoInputSchema = yup.object().shape(
             .matches(usernameRegex, fieldInvalidMsg("نام کاربری"))
             .max(20, fieldMaxMsg("نام کاربری", 20)),
       }),
-    email: yup.string().nullable().email(fieldInvalidMsg("آدرس ایمیل")),
+    email: yup
+      .string()
+      .required(fieldRequiredMsg("آدرس ایمیل"))
+      .email(fieldInvalidMsg("آدرس ایمیل")),
     promoCode: yup.string().nullable(),
     birthday: yup.date().typeError(fieldInvalidMsg("تاریخ تولد")).nullable(),
     gender: yup
@@ -96,34 +99,45 @@ export const setupUserInfoInputSchema = yup.object().shape(
 
     password: yup
       .string()
-      .optional()
-      .nullable()
-      .notRequired()
-      .when("password", {
-        is: (value: any) => value?.length,
-        then: (rule) => rule.matches(strongRegex, passwordPatternError),
-      }),
+      .required(fieldRequiredMsg("رمز عبور"))
+      .matches(strongRegex, passwordPatternError),
     confPassword: yup
       .string()
-      .optional()
-      .nullable()
-      .notRequired()
-      .when("password", {
-        is: (value: any) => value?.length,
-        then: (rule) =>
-          rule
-            .required(fieldRequiredMsg("تکرار رمز عبور"))
-            .oneOf(
-              [yup.ref("password")],
-              "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
-            ),
-      }),
+      .required(fieldRequiredMsg("تکرار عبور"))
+      .oneOf(
+        [yup.ref("password")],
+        "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
+      ),
+    // password: yup
+    //   .string()
+    //   .optional()
+    //   .nullable()
+    //   .notRequired()
+    //   .when("password", {
+    //     is: (value: any) => value?.length,
+    //     then: (rule) => rule.matches(strongRegex, passwordPatternError),
+    //   }),
+    // confPassword: yup
+    //   .string()
+    //   .optional()
+    //   .nullable()
+    //   .notRequired()
+    //   .when("password", {
+    //     is: (value: any) => value?.length,
+    //     then: (rule) =>
+    //       rule
+    //         .required(fieldRequiredMsg("تکرار رمز عبور"))
+    //         .oneOf(
+    //           [yup.ref("password")],
+    //           "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
+    //         ),
+    //   }),
   },
   [
     // Add Cyclic deps here because when require itself
     ["fName", "fName"],
     ["lName", "lName"],
     ["username", "username"],
-    ["password", "password"],
+    // ["password", "password"],
   ]
 );

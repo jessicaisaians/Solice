@@ -20,6 +20,10 @@ export interface GraphQLContext {
   res: express.Response;
 }
 
+export enum Role {
+    USER,
+    ADMIN
+}
 export interface Session {
   user?: User;
 }

@@ -11,12 +11,12 @@ import { createServer } from "http";
 import fetch from "isomorphic-unfetch";
 import kave from "kavenegar";
 import { Session } from "next-auth";
-import { getSession } from "next-auth/react";
 import NodeCache from "node-cache";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import zarinpalCheckout from "zarinpal-checkout";
 import resolvers from "./graphql/resolvers";
+import { getServerSession } from "./utils/functions";
 const zarinpal = zarinpalCheckout.create(
   "00000000-0000-0000-0000-000000000000",
   true
@@ -69,9 +69,9 @@ const main = async () => {
 
     expressMiddleware(server, {
       context: async ({ req, res }) => {
-        const session: Session | null = await getSession({
-          req,
-        });
+        const session: Session | null = await getServerSession(
+          req.headers.cookie ?? ""
+        );
         return {
           req,
           res,
@@ -97,7 +97,6 @@ const main = async () => {
 
   const PORT = parseInt(process.env.PORT as string);
   // Now that our HTTP server is fully set up, we can listen to it.
-  console.log(";sdsd");
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: PORT }, resolve)
   );

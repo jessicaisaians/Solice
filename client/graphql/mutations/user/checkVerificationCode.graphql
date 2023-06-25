@@ -1,0 +1,15 @@
+mutation CheckVerificationCode($mobile: String!, $code: String!) {
+  checkVerificationCode(mobile: $mobile, code: $code) {
+    success
+    isLogin
+    hasPassword
+    errors {
+      path
+      message
+    }
+    user {
+      id
+      role
+    }
+  }
+}

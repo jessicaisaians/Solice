@@ -12,9 +12,18 @@ export class SendVerificationCodeResponse {
   errors?: FieldError[];
 }
 @ObjectType()
+export class UserSessionInfo {
+  @Field(() => String)
+  id: string;
+  @Field(() => String)
+  role: string;
+}
+@ObjectType()
 export class SetupUserInfoResponse {
   @Field(() => Boolean)
   success: boolean;
+  @Field(() => UserSessionInfo, { nullable: true })
+  user?: UserSessionInfo;
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 }
@@ -24,8 +33,12 @@ export class CheckVerificationCodeResponse {
   success: boolean;
   @Field(() => Boolean, { nullable: true })
   isLogin?: boolean;
+  @Field(() => Boolean, { nullable: true })
+  hasPassword?: boolean;
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
+  @Field(() => UserSessionInfo, { nullable: true })
+  user?: UserSessionInfo;
 }
 @InputType()
 export class SetupUserInfoInput {

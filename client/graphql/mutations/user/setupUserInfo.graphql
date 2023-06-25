@@ -1,0 +1,13 @@
+mutation SetupUserInfo($options: SetupUserInfoInput!) {
+  setupUserInfo(options: $options) {
+    errors {
+      message
+      path
+    }
+    success
+    user {
+      id
+      role
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import kave from "kavenegar";
+import fetch from "node-fetch";
 import { promisify } from "util";
 import { formatYupError } from "./validators/user";
 
@@ -28,3 +29,11 @@ export const handleReturnError = (err: any) => ({
     : [{ path: "", message: err?.message ?? "مشکلی رخ داده است." }],
   success: false,
 });
+
+export const getServerSession = async (cookie: string) => {
+  const res = await fetch("http://localhost:3000/api/auth/session", {
+    headers: { cookie: cookie },
+  });
+  const session = await res.json();
+  return session;
+};

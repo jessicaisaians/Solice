@@ -24,7 +24,7 @@ const Index: FC<IndexProps> = ({ children }) => {
         props={{
           options: {
             lerp: 0.03, // Linear Interpolation, 0 > 1 // Try 0.01
-            multiplier: 1.4, // Effect Multiplier,
+            multiplier: 1.2, // Effect Multiplier,
             touchMultiplier: 2.1,
             smooth: true,
             smartphone: {

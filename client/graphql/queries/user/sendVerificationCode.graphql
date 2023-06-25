@@ -1,0 +1,11 @@
+query SendVerificationCode($mobile: String!) {
+  sendVerificationCode(mobile: $mobile) {
+    success
+    isLogin
+    hasPassword
+    errors {
+      path
+      message
+    }
+  }
+}

@@ -6,6 +6,7 @@ export const isUserAuth: MiddlewareFn<GraphQLContext> = async (
   next
 ) => {
   try {
+    console.log("context", context?.session);
     if (!context.session?.user)
       throw new GraphQLError("شما مجوز دسترسی به این منبع را ندارید.", {
         extensions: {
