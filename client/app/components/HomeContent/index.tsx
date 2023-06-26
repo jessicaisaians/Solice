@@ -5,7 +5,7 @@ import Cursor from "../Cursor";
 import HamburgerMenu from "../HamburgerMenu";
 import LocomotiveScrollProviderClient from "../LocomotiveScrollProviderClient";
 import Navbar from "../Navbar";
-
+import ProfileBtn from "../ProfileBtn";
 interface IndexProps {
   children: any;
 }
@@ -16,6 +16,7 @@ const Index: FC<IndexProps> = ({ children }) => {
 
   return (
     <main className="min-h-[1200px] relative">
+      <ProfileBtn />
       <Navbar />
       <HamburgerMenu />
       <Cursor />

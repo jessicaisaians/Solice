@@ -23,8 +23,9 @@ const OTPInput: FC<OTPInputProps> = ({ otp, setOTP }) => {
     const { value } = target;
     const newOTP: string[] = [...otp];
     newOTP[currentOtpIndex] = value.substring(value.length - 1);
-    if (!value) setActiveOtpIndex(currentOtpIndex - 1);
-    else setActiveOtpIndex(currentOtpIndex + 1);
+    // if (!value) setActiveOtpIndex(currentOtpIndex - 1);
+    // else
+    if (value) setActiveOtpIndex(currentOtpIndex + 1);
     setOTP(newOTP);
   };
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -40,6 +41,7 @@ const OTPInput: FC<OTPInputProps> = ({ otp, setOTP }) => {
   };
   useEffect(() => {
     inputRef?.current?.focus();
+    inputRef?.current?.select()
   }, [activeOtpIndex]);
   return (
     <div

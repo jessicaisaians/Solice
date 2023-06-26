@@ -82,7 +82,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
         });
       });
     } else {
-      toast.success("ثبت‌نام با موفقیت!");
+      toast.success("ثبت‌نام با موفقیت انجام شد!");
       // navigate to home
     }
   };

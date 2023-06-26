@@ -21,7 +21,7 @@ const Menu: FC<MenuProps> = ({ menuOnly }) => {
                 txtColor="#3d7299"
                 bgColor="#fff"
                 padding="16px 32px 16px"
-                link="/register"
+                link="/login"
                 btnText="ایجاد حساب کاربری"
               />
             </div>

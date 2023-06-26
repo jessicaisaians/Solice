@@ -37,11 +37,11 @@ const MobileValidation: FC<MobileValidationProps> = ({
   const [hasTimerEnded, setHasTimerEnded] = useState(false);
   const [usePassword, setUsePassword] = useState(false);
   const [showPasswords, setShowPasswords] = useState<boolean>(false);
-  const [checkCode] = useCheckVerificationCodeMutation();
+  const [checkCode, { loading: checkCodeLoading }] =
+    useCheckVerificationCodeMutation();
   const [passwordLogin] = usePasswordLoginLazyQuery();
 
-  const [_, { loading: sendCodeLoading, refetch }] =
-    useSendVerificationCodeLazyQuery();
+  const [_, { refetch }] = useSendVerificationCodeLazyQuery();
   const handlePasswordLogin = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     //send password to server check if its ok
@@ -217,7 +217,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
             link="/"
             btnText={usePassword ? "ورود" : "بررسی کد"}
             type="submit"
-            isLoading={sendCodeLoading}
+            isLoading={checkCodeLoading}
           />
         </div>
         {isLogin && hasPassword ? (

@@ -9,7 +9,7 @@ const Page: FC<PageProps> = ({}) => {
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
-      redirect("/register?callbackUrl=/protected/client");
+      redirect("/login?callbackUrl=/protected/client");
     },
   });
   return (

@@ -45,8 +45,8 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: rgb(214 211 209) !important;
 }
 input:-internal-autofill-selected {
-    transition: background-color 5000s ease-in-out 0s !important;
-   -webkit-text-fill-color: rgb(214 211 209) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  -webkit-text-fill-color: rgb(214 211 209) !important;
 }
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -212,6 +212,59 @@ body {
 }
 
 /* End of Header Image */
+/* User Account */
+.triangle,
+.triangle:before,
+.triangle:after {
+  width: 4em;
+  height: 4em;
+}
+.triangle {
+  overflow: hidden;
+  position: absolute;
+  border-radius: 20%;
+  transform: translateY(50%) rotate(30deg) skewY(30deg) scaleX(0.866) scale(0.3);
+  cursor: pointer;
+  bottom: 96%;
+  left: -1rem;
+  pointer-events: none;
+}
+.triangle:before,
+.triangle:after {
+  position: absolute;
+  background: #1a1b1c;
+  pointer-events: auto;
+  content: "";
+}
+.triangle:before {
+  border-radius: 20% 20% 20% 53%;
+  transform: scaleX(1.155) skewY(-30deg) rotate(-30deg) translateY(-42.3%)
+    skewX(30deg) scaleY(0.866) translateX(-24%);
+}
+.triangle:after {
+  border-radius: 20% 20% 53% 20%;
+  transform: scaleX(1.155) skewY(-30deg) rotate(-30deg) translateY(-42.3%)
+    skewX(-30deg) scaleY(0.866) translateX(24%);
+}
+.profile {
+  background-color: #1a1b1c;
+  position: fixed;
+  top: 1rem;
+  left: 54px;
+  height: 3.4rem;
+  width: 3.4rem;
+  font-size: 21px;
+  /* transform: translateY(-3rem); */
+  z-index: 998;
+  translate: none;
+  rotate: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scale: none;
+  color: #fff;
+}
 /* Navbar */
 .navigation {
   background-color: #1a1b1c;
