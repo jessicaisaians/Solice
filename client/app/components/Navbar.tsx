@@ -153,15 +153,17 @@ const Navbar: FC<NavbarProps> = ({}) => {
             درباره ما
           </Link>
         </li>
-        <li
-          className={`right-5 active_item_box block absolute top-1/2 -translate-y-1/2 h-full my-auto mx-0 rounded-3xl will-change-transform -z-10 bg-[#2f3133] `}
-          style={{
-            transform: "translate(0%, -50%) translate(0, 0)",
-            translate: "none",
-            rotate: "none",
-            scale: "none",
-          }}
-        ></li>
+        {Object.hasOwn(linkWidthMap, pathname) ? (
+          <li
+            className={`right-5 active_item_box block absolute top-1/2 -translate-y-1/2 h-full my-auto mx-0 rounded-3xl will-change-transform -z-10 bg-[#2f3133] `}
+            style={{
+              transform: "translate(0%, -50%) translate(0, 0)",
+              translate: "none",
+              rotate: "none",
+              scale: "none",
+            }}
+          ></li>
+        ) : null}
       </ul>
     </nav>
   );

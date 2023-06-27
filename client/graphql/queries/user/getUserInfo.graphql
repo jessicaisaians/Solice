@@ -1,0 +1,11 @@
+query GetUserInfo($mobile: String!) {
+  getUserInfo(mobile: $mobile) {
+    birthday
+    email
+    firstName
+    lastName
+    gender
+    username
+    promoCode
+  }
+}

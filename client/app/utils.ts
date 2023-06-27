@@ -1,5 +1,19 @@
 import moment from "jalali-moment";
 
+export const dateToYYMMDD = (
+  date: string
+): {
+  year: number;
+  month: number;
+  day: number;
+} => {
+  try {
+    const d = moment(date).locale("fa");
+    return { year: d.get("year"), month: d.get("month") + 1, day: d.get("D") };
+  } catch (err) {
+    return { year: 0, month: 0, day: 0 };
+  }
+};
 export const calculateDuration = (
   startTimestamp: number,
   endTimestamp: number

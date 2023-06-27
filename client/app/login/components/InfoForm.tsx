@@ -1,49 +1,71 @@
 "use client";
 import ButtonFollowCursor from "@/app/components/HomeContent/sections/Collections/ButtonFollowCursor";
+import { LoginContext } from "@/app/contexts/LoginContext";
 import {
   calcAgeFromYYYMMDD,
   convertYYYYMMDDToDate,
+  dateToYYMMDD,
   isValidDate,
   numberInRange,
 } from "@/app/utils";
-import { useSetupUserInfoMutation } from "@/generated/graphql";
+import {
+  useGetUserInfoQuery,
+  useSetupUserInfoMutation,
+} from "@/generated/graphql";
 import moment from "jalali-moment";
-import { ChangeEvent, FC, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChangeEvent, FC, useContext, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaAsterisk } from "react-icons/fa";
+
 enum GenderEnum {
-  FEMALE = "female",
-  MALE = "male",
+  FEMALE = "FEMALE",
+  MALE = "MALE",
 }
 interface InfoFormProps {}
-interface FormValues {
-  fName: string;
-  lName: string;
-  username: string;
-  email: string;
-  gender: GenderEnum;
-  password: string;
-  confPassword: string;
-  promoCode: string;
-  birthDate: string;
-}
-const InfoForm: FC<InfoFormProps> = ({}) => {
+
+const InfoForm: FC<InfoFormProps> = () => {
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const [year, setYear] = useState<number>(0);
+  const [month, setMonth] = useState<number>(0);
+  const [day, setDay] = useState<number>(0);
   const [birthDateErr, setBirthDateErr] = useState("");
   const [showPasswords, setShowPasswords] = useState<boolean>(false);
+  let { isLogin, mobile, hasPassword, setHasPassword } =
+    useContext(LoginContext);
+  const { data: userInfo } = useGetUserInfoQuery({
+    variables: { mobile: mobile ?? "" },
+  });
   const [setupInfoMutation, { loading: setupInfoLoading }] =
     useSetupUserInfoMutation();
   const {
     register,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({});
+
+  useEffect(() => {
+    if (userInfo) {
+      const regex = new RegExp(/\S+@\S+\.\S+/);
+      const { birthday, email, ...info } = userInfo.getUserInfo;
+      const hasEmail = regex.test(email ?? "");
+      reset({ ...info, ...(hasEmail && { email }) });
+      setDay(dateToYYMMDD(birthday)?.day ?? 0);
+      setMonth(dateToYYMMDD(birthday)?.month ?? 0);
+      setYear(dateToYYMMDD(birthday)?.year ?? 0);
+    }
+  }, [userInfo, reset, isLogin]);
+
   const onSubmit: SubmitHandler<any> = async ({
-    fName,
+    firstName,
     gender,
-    lName,
+    lastName,
     username,
     confPassword,
     password,
@@ -66,8 +88,8 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
           birthday,
           confPassword,
           email,
-          fName,
-          lName,
+          firstName,
+          lastName,
           password,
           promoCode,
           username,
@@ -83,12 +105,10 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
       });
     } else {
       toast.success("ثبت‌نام با موفقیت انجام شد!");
-      // navigate to home
+      router.replace((searchParams.get("callbackUrl") as string) ?? "/");
     }
   };
-  const [year, setYear] = useState<number>(0);
-  const [month, setMonth] = useState<number>(0);
-  const [day, setDay] = useState<number>(0);
+
   const handleOnChangeYear = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value.length >= 4) {
@@ -145,7 +165,7 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
         <div className="relative z-0 w-[350px]  mb-4 group text-stone-400 ">
           <label htmlFor="field-male" className="ml-8">
             <input
-              checked
+              // checked
               {...register("gender")}
               type="radio"
               value={GenderEnum.MALE}
@@ -167,11 +187,11 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
         </div>
         <div className="relative z-0 w-full mb-6 group">
           <input
-            autoFocus 
-            id="fName"
+            autoFocus
+            id="firstName"
             className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
             placeholder=" "
-            {...register("fName", {
+            {...register("firstName", {
               pattern: {
                 value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
                 message: "نام وارد شده نامعتبر می‌باشد.",
@@ -187,23 +207,23 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             })}
           />
           <label
-            htmlFor="fName"
+            htmlFor="firstName"
             className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             نام
           </label>
-          {errors.fName && (
+          {errors.firstName && (
             <p role="alert" className="text-yellow-600 mt-4 text-xs">
-              {errors.fName.message?.toString()}
+              {errors.firstName.message?.toString()}
             </p>
           )}
         </div>
         <div className="relative z-0 w-full mb-6 group">
           <input
-            id="lName"
+            id="lastName"
             className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
             placeholder=" "
-            {...register("lName", {
+            {...register("lastName", {
               pattern: {
                 value: /^[a-zA-Z\u0600-\u06FF\s]+$/,
 
@@ -220,14 +240,14 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             })}
           />
           <label
-            htmlFor="lName"
+            htmlFor="lastName"
             className="peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             نام خانوادگی
           </label>
-          {errors.lName && (
+          {errors.lastName && (
             <p role="alert" className="text-yellow-600  mt-4 text-xs">
-              {errors.lName.message?.toString()}
+              {errors.lastName.message?.toString()}
             </p>
           )}
         </div>
@@ -290,102 +310,108 @@ const InfoForm: FC<InfoFormProps> = ({}) => {
             </p>
           )}
         </div>
-        <div className="mb-6 ">
-          <div className="relative z-0 w-full group">
-            <input
-              id="password"
-              type={showPasswords ? "text" : "password"}
-              className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
-              placeholder=" "
-              {...register("password", {
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
-                  message:
-                    "رمز عبور باید حداقل شامل یک عدد، یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد و طول آن حداقل 8 کاراکتر باشد",
-                },
-                required: {
-                  value: true,
-                  message: "وارد کردن رمز عبور الزامی می‌باشد",
-                },
-              })}
-            />
+        {!hasPassword && (
+          <>
+            {" "}
+            <div className="mb-6 ">
+              <div className="relative z-0 w-full group">
+                <input
+                  id="password"
+                  type={showPasswords ? "text" : "password"}
+                  className="block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
+                  placeholder=" "
+                  {...register("password", {
+                    pattern: {
+                      value:
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
+                      message:
+                        "رمز عبور باید حداقل شامل یک عدد، یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد و طول آن حداقل 8 کاراکتر باشد",
+                    },
+                    required: {
+                      value: true,
+                      message: "وارد کردن رمز عبور الزامی می‌باشد",
+                    },
+                  })}
+                />
 
-            {showPasswords ? (
-              <AiOutlineEyeInvisible
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6"
-                onClick={() => setShowPasswords(false)}
-              />
-            ) : (
-              <AiOutlineEye
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6 "
-                onClick={() => setShowPasswords(true)}
-              />
-            )}
-            <label
-              htmlFor="password"
-              className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              <p>رمز عبور</p> <FaAsterisk className="text-yellow-800  h-2" />
-            </label>
-          </div>
-          {errors.password && (
-            <p
-              role="alert"
-              className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
-            >
-              {errors.password.message?.toString()}
-            </p>
-          )}
-        </div>
-        <div className="mb-6 ">
-          <div className="relative z-0 w-full  group">
-            <input
-              id="confPassword"
-              type={showPasswords ? "text" : "password"}
-              className="relative block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
-              placeholder=" "
-              {...register("confPassword", {
-                pattern: {
-                  value:
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
-                  message:
-                    "رمز عبور باید حداقل شامل یک عدد، یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد و طول آن حداقل 8 کاراکتر باشد",
-                },
-                required: {
-                  value: true,
-                  message: "وارد کردن تکرار رمز عبور الزامی می‌باشد",
-                },
-              })}
-            />
-            {showPasswords ? (
-              <AiOutlineEyeInvisible
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6"
-                onClick={() => setShowPasswords(false)}
-              />
-            ) : (
-              <AiOutlineEye
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6 "
-                onClick={() => setShowPasswords(true)}
-              />
-            )}
-            <label
-              htmlFor="confPassword"
-              className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              <p>تکرار رمز عبور</p>{" "}
-              <FaAsterisk className="text-yellow-800  h-2" />
-            </label>
-          </div>
-          {errors.confPassword && (
-            <p
-              role="alert"
-              className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
-            >
-              {errors.confPassword.message?.toString()}
-            </p>
-          )}
-        </div>
+                {showPasswords ? (
+                  <AiOutlineEyeInvisible
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6"
+                    onClick={() => setShowPasswords(false)}
+                  />
+                ) : (
+                  <AiOutlineEye
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6 "
+                    onClick={() => setShowPasswords(true)}
+                  />
+                )}
+                <label
+                  htmlFor="password"
+                  className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                >
+                  <p>رمز عبور</p>{" "}
+                  <FaAsterisk className="text-yellow-800  h-2" />
+                </label>
+              </div>
+              {errors.password && (
+                <p
+                  role="alert"
+                  className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
+                >
+                  {errors.password.message?.toString()}
+                </p>
+              )}
+            </div>
+            <div className="mb-6 ">
+              <div className="relative z-0 w-full  group">
+                <input
+                  id="confPassword"
+                  type={showPasswords ? "text" : "password"}
+                  className="relative block py-2.5 px-0 w-full text-base text-stone-300 bg-transparent border-0 border-b-2 border-stone-500 appearance-none  focus:outline-none focus:ring-0 focus:border-stone-400 peer"
+                  placeholder=" "
+                  {...register("confPassword", {
+                    pattern: {
+                      value:
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
+                      message:
+                        "رمز عبور باید حداقل شامل یک عدد، یک حرف بزرگ، یک حرف کوچک و یک کاراکتر خاص باشد و طول آن حداقل 8 کاراکتر باشد",
+                    },
+                    required: {
+                      value: true,
+                      message: "وارد کردن تکرار رمز عبور الزامی می‌باشد",
+                    },
+                  })}
+                />
+                {showPasswords ? (
+                  <AiOutlineEyeInvisible
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6"
+                    onClick={() => setShowPasswords(false)}
+                  />
+                ) : (
+                  <AiOutlineEye
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 h-6 w-6 "
+                    onClick={() => setShowPasswords(true)}
+                  />
+                )}
+                <label
+                  htmlFor="confPassword"
+                  className="flex peer-focus:font-medium absolute text-sm text-stone-500 duration-300 transform  -translate-y-6 scale-75 top-2 -z-10 origin-right peer-focus:right-0 peer-focus:text-stone-500  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                >
+                  <p>تکرار رمز عبور</p>{" "}
+                  <FaAsterisk className="text-yellow-800  h-2" />
+                </label>
+              </div>
+              {errors.confPassword && (
+                <p
+                  role="alert"
+                  className="text-yellow-600  mt-4 text-xs max-w-[350px]  leading-6"
+                >
+                  {errors.confPassword.message?.toString()}
+                </p>
+              )}
+            </div>
+          </>
+        )}
         <div className="relative z-0 w-full mb-6 group">
           <input
             id="promoCode"

@@ -24,6 +24,10 @@ export enum Role {
     USER,
     ADMIN
 }
+export enum Gender {
+    FEMALE,
+    MALE
+}
 export interface Session {
   user?: User;
 }

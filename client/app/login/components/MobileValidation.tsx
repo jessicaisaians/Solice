@@ -1,5 +1,6 @@
 "use client";
 import ButtonFollowCursor from "@/app/components/HomeContent/sections/Collections/ButtonFollowCursor";
+import { LoginContext } from "@/app/contexts/LoginContext";
 import {
   useCheckVerificationCodeMutation,
   usePasswordLoginLazyQuery,
@@ -7,29 +8,28 @@ import {
 } from "@/generated/graphql";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
+import { FC, FormEvent, useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import InfoForm from "./InfoForm";
-import InitialForm, { FormValues } from "./InitialForm";
+import InitialForm from "./InitialForm";
 import OTPInput from "./OTPInput";
 import Timer from "./Timer";
-export interface MobileValidationProps {
-  setComponentToRender: Dispatch<SetStateAction<any>>;
-  currFormValues?: FormValues;
-  isLogin: boolean;
-  hasPassword: boolean;
-}
+export interface MobileValidationProps {}
 
-const MobileValidation: FC<MobileValidationProps> = ({
-  setComponentToRender,
-  currFormValues,
-  isLogin,
-  hasPassword,
-}) => {
+const MobileValidation: FC<MobileValidationProps> = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  let {
+    setComponentToRender,
+    isLogin,
+    setIsLogin,
+    setNoRedirect,
+    mobile,
+    hasPassword,
+    setHasPassword,
+  } = useContext(LoginContext);
 
   const [otp, setOTP] = useState<string[]>(new Array(4).fill(""));
   const [err, setErr] = useState<string>("");
@@ -39,7 +39,8 @@ const MobileValidation: FC<MobileValidationProps> = ({
   const [showPasswords, setShowPasswords] = useState<boolean>(false);
   const [checkCode, { loading: checkCodeLoading }] =
     useCheckVerificationCodeMutation();
-  const [passwordLogin] = usePasswordLoginLazyQuery();
+  const [passwordLogin, { loading: checkPasswordLoading }] =
+    usePasswordLoginLazyQuery();
 
   const [_, { refetch }] = useSendVerificationCodeLazyQuery();
   const handlePasswordLogin = async (e?: FormEvent<HTMLFormElement>) => {
@@ -48,7 +49,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
     const data = await passwordLogin({
       variables: {
         password,
-        mobile: currFormValues?.mobile ?? "",
+        mobile: mobile ?? "",
       },
     });
     if (data.data?.passwordLogin.errors) {
@@ -58,10 +59,13 @@ const MobileValidation: FC<MobileValidationProps> = ({
       const result = await signIn("credentials", {
         id: data?.data?.passwordLogin?.user?.id,
         role: data?.data?.passwordLogin?.user?.role,
+        redirect: false,
         callbackUrl: (searchParams.get("callbackUrl") as string) ?? "/",
       });
-      if (result?.ok) toast.success("ورود با موفقیت!");
-      else if (result?.error)
+      if (result?.ok) {
+        toast.success("ورود با موفقیت!");
+        router.replace((searchParams.get("callbackUrl") as string) ?? "/");
+      } else if (result?.error)
         toast.error(result?.error ?? "مشکلی رخ داده است.");
     }
   };
@@ -76,7 +80,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
       const data = await checkCode({
         variables: {
           code: otp.join(""),
-          mobile: currFormValues?.mobile ?? "",
+          mobile: mobile ?? "",
         },
       });
       if (data.data?.checkVerificationCode.errors) {
@@ -87,18 +91,31 @@ const MobileValidation: FC<MobileValidationProps> = ({
           id: data?.data?.checkVerificationCode.user?.id,
           role: data?.data?.checkVerificationCode.user?.role,
           redirect: false,
+          callbackUrl: (searchParams.get("callbackUrl") as string) ?? "/",
         });
-        const isLogin = data.data?.checkVerificationCode?.isLogin;
-        if (isLogin) {
-          const callbackUrl = searchParams.get("callbackUrl") ?? "/";
-          if (!data.data?.checkVerificationCode?.hasPassword) {
+        if (result?.ok) {
+          const isLogin = data.data?.checkVerificationCode?.isLogin;
+          setIsLogin(isLogin ?? false);
+          if (isLogin) {
+            const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+            setHasPassword(
+              data.data?.checkVerificationCode?.hasPassword ?? false
+            );
+            if (!data.data?.checkVerificationCode?.hasPassword) {
+              setNoRedirect(true);
+              setComponentToRender(<InfoForm />);
+            } else {
+              toast.success("ورود با موفقیت!");
+              router.replace(callbackUrl as string);
+            }
+          } else {
+            // navigate to Setup Info component
+            setNoRedirect(true);
             setComponentToRender(<InfoForm />);
-          } else router.replace(callbackUrl as string);
+          }
         } else {
-          // navigate to Setup Info compoennet
-          setComponentToRender(<InfoForm />);
+          toast.error(result?.error ?? "مشکلی رخ داده است.");
         }
-        console.log(result);
       }
     } catch (err: any) {
       setErr(err?.message);
@@ -106,7 +123,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
   };
   const handleResendCode = async () => {
     const data = await refetch({
-      mobile: currFormValues?.mobile ?? "",
+      mobile: mobile ?? "",
     });
     if (data?.data?.sendVerificationCode?.success) {
       setHasTimerEnded(false);
@@ -131,18 +148,13 @@ const MobileValidation: FC<MobileValidationProps> = ({
         <div className="my-5 text-stone-400 text-base flex flex-col text-center">
           <div>
             {usePassword && isLogin
-              ? ` رمز عبور حساب کاربری با شماره ${currFormValues?.mobile} را وارد کنید `
-              : `کد ارسال شده به شماره ${currFormValues?.mobile} را وارد کنید`}
+              ? ` رمز عبور حساب کاربری با شماره ${mobile} را وارد کنید `
+              : `کد ارسال شده به شماره ${mobile} را وارد کنید`}
             <span className="mr-2">
               <button
                 className="text-stone-500 text-base cursor-scale hover:text-stone-300 transition "
                 onClick={() => {
-                  setComponentToRender(
-                    <InitialForm
-                      setComponentToRender={setComponentToRender}
-                      currFormValues={currFormValues}
-                    />
-                  );
+                  setComponentToRender(<InitialForm />);
                 }}
               >
                 <FiEdit className="cursor-scale" />
@@ -173,6 +185,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
           <div className="mb-6 ">
             <div className="relative z-0 w-full group">
               <input
+                autoFocus
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -217,7 +230,7 @@ const MobileValidation: FC<MobileValidationProps> = ({
             link="/"
             btnText={usePassword ? "ورود" : "بررسی کد"}
             type="submit"
-            isLoading={checkCodeLoading}
+            isLoading={usePassword ? checkPasswordLoading : checkCodeLoading}
           />
         </div>
         {isLogin && hasPassword ? (

@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import argon2 from "argon2";
+import pick from "lodash.pick";
 import {
   Arg,
   Ctx,
@@ -13,6 +14,7 @@ import { handleReturnError } from "../../utils/functions";
 import { GraphQLContext } from "../../utils/types";
 import {
   CheckVerificationCodeResponse,
+  GetUserInfoResponse,
   SendVerificationCodeResponse,
   SetupUserInfoInput,
   SetupUserInfoResponse,
@@ -112,6 +114,29 @@ export class UserResolver {
       return handleReturnError(err);
     }
   }
+  @Query(() => GetUserInfoResponse)
+  async getUserInfo(
+    @Arg("mobile") mobile: string,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<GetUserInfoResponse> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { mobile: mobile.trim() },
+      });
+      if (!user) throw new Error("کاربری با مشخصات وارد شده یافت نشد");
+      return pick(user, [
+        "birthday",
+        "email",
+        "firstName",
+        "lastName",
+        "gender",
+        "username",
+        "promoCode",
+      ]);
+    } catch (err) {
+      throw new Error(err?.message ?? err);
+    }
+  }
   @Mutation(() => CheckVerificationCodeResponse)
   async checkVerificationCode(
     @Arg("mobile", () => String) mobile: string,
@@ -144,7 +169,6 @@ export class UserResolver {
             hasPassword: !!user?.password,
           };
         } catch (err) {
-          console.log(err);
           if (err.code === "P2002") {
             const user = await prisma.user.findFirst({
               where: {
@@ -178,8 +202,8 @@ export class UserResolver {
       const {
         birthday,
         password,
-        fName: firstName,
-        lName: lastName,
+        firstName,
+        lastName,
         email,
         promoCode,
         gender,

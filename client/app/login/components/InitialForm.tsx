@@ -1,22 +1,15 @@
 "use client";
+import { LoginContext } from "@/app/contexts/LoginContext";
 import { useSendVerificationCodeLazyQuery } from "@/generated/graphql";
-import { Dispatch, FC, SetStateAction, useEffect } from "react";
+import { FC, useContext, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import ButtonFollowCursor from "../../components/HomeContent/sections/Collections/ButtonFollowCursor";
 import MobileValidation from "./MobileValidation";
 
-export interface InitialFormProps {
-  setComponentToRender: Dispatch<SetStateAction<any>>;
-  currFormValues?: FormValues;
-}
-export type FormValues = {
-  mobile: string;
-};
-const InitialForm: FC<InitialFormProps> = ({
-  setComponentToRender,
-  currFormValues,
-}) => {
+export interface InitialFormProps {}
+
+const InitialForm: FC<InitialFormProps> = () => {
   const {
     reset,
     register,
@@ -24,12 +17,14 @@ const InitialForm: FC<InitialFormProps> = ({
     setError,
     formState: { errors },
   } = useForm();
+  let { setComponentToRender, setIsLogin, mobile, setMobile, setHasPassword } =
+    useContext(LoginContext);
   const [sendVerificationCode, { loading }] = useSendVerificationCodeLazyQuery({
     fetchPolicy: "network-only",
   });
   useEffect(() => {
-    reset(currFormValues);
-  }, [currFormValues, reset]);
+    reset({ mobile });
+  }, [mobile, reset]);
 
   const onSubmit: SubmitHandler<any> = async ({ mobile }) => {
     const { data } = await sendVerificationCode({
@@ -44,12 +39,11 @@ const InitialForm: FC<InitialFormProps> = ({
         message: data?.sendVerificationCode?.errors?.[0]?.message,
       });
     } else if (data?.sendVerificationCode?.success) {
+      setIsLogin(data?.sendVerificationCode?.isLogin ?? false);
+      setMobile(mobile);
+      setHasPassword(data?.sendVerificationCode?.hasPassword ?? false);
       setComponentToRender(
         <MobileValidation
-          setComponentToRender={setComponentToRender}
-          currFormValues={{ mobile }}
-          isLogin={data?.sendVerificationCode?.isLogin ?? false}
-          hasPassword={data?.sendVerificationCode?.hasPassword ?? false}
         />
       );
     }

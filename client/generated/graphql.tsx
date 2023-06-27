@@ -33,6 +33,17 @@ export type FieldError = {
   path: Scalars['String']['output'];
 };
 
+export type GetUserInfoResponse = {
+  __typename?: 'GetUserInfoResponse';
+  birthday?: Maybe<Scalars['DateTime']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  firstName?: Maybe<Scalars['String']['output']>;
+  gender: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
+  promoCode?: Maybe<Scalars['String']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   checkVerificationCode: CheckVerificationCodeResponse;
@@ -52,8 +63,14 @@ export type MutationSetupUserInfoArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getUserInfo: GetUserInfoResponse;
   passwordLogin: CheckVerificationCodeResponse;
   sendVerificationCode: SendVerificationCodeResponse;
+};
+
+
+export type QueryGetUserInfoArgs = {
+  mobile: Scalars['String']['input'];
 };
 
 
@@ -79,9 +96,9 @@ export type SetupUserInfoInput = {
   birthday?: InputMaybe<Scalars['DateTime']['input']>;
   confPassword?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  fName?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
   gender: Scalars['String']['input'];
-  lName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   promoCode?: InputMaybe<Scalars['String']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
@@ -122,6 +139,13 @@ export type SetupUserInfoMutationVariables = Exact<{
 
 
 export type SetupUserInfoMutation = { __typename?: 'Mutation', setupUserInfo: { __typename?: 'SetupUserInfoResponse', success: boolean, errors?: Array<{ __typename?: 'FieldError', message: string, path: string }> | null, user?: { __typename?: 'UserSessionInfo', id: string, role: string } | null } };
+
+export type GetUserInfoQueryVariables = Exact<{
+  mobile: Scalars['String']['input'];
+}>;
+
+
+export type GetUserInfoQuery = { __typename?: 'Query', getUserInfo: { __typename?: 'GetUserInfoResponse', birthday?: any | null, email?: string | null, firstName?: string | null, lastName?: string | null, gender: string, username?: string | null, promoCode?: string | null } };
 
 export type SendVerificationCodeQueryVariables = Exact<{
   mobile: Scalars['String']['input'];
@@ -261,6 +285,47 @@ export function useSetupUserInfoMutation(baseOptions?: Apollo.MutationHookOption
 export type SetupUserInfoMutationHookResult = ReturnType<typeof useSetupUserInfoMutation>;
 export type SetupUserInfoMutationResult = Apollo.MutationResult<SetupUserInfoMutation>;
 export type SetupUserInfoMutationOptions = Apollo.BaseMutationOptions<SetupUserInfoMutation, SetupUserInfoMutationVariables>;
+export const GetUserInfoDocument = gql`
+    query GetUserInfo($mobile: String!) {
+  getUserInfo(mobile: $mobile) {
+    birthday
+    email
+    firstName
+    lastName
+    gender
+    username
+    promoCode
+  }
+}
+    `;
+
+/**
+ * __useGetUserInfoQuery__
+ *
+ * To run a query within a React component, call `useGetUserInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserInfoQuery({
+ *   variables: {
+ *      mobile: // value for 'mobile'
+ *   },
+ * });
+ */
+export function useGetUserInfoQuery(baseOptions: Apollo.QueryHookOptions<GetUserInfoQuery, GetUserInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserInfoQuery, GetUserInfoQueryVariables>(GetUserInfoDocument, options);
+      }
+export function useGetUserInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserInfoQuery, GetUserInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserInfoQuery, GetUserInfoQueryVariables>(GetUserInfoDocument, options);
+        }
+export type GetUserInfoQueryHookResult = ReturnType<typeof useGetUserInfoQuery>;
+export type GetUserInfoLazyQueryHookResult = ReturnType<typeof useGetUserInfoLazyQuery>;
+export type GetUserInfoQueryResult = Apollo.QueryResult<GetUserInfoQuery, GetUserInfoQueryVariables>;
 export const SendVerificationCodeDocument = gql`
     query SendVerificationCode($mobile: String!) {
   sendVerificationCode(mobile: $mobile) {

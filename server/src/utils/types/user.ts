@@ -1,3 +1,4 @@
+import { Gender } from "@prisma/client";
 import { Field, InputType, ObjectType } from "type-graphql";
 import { FieldError } from ".";
 @ObjectType()
@@ -17,6 +18,23 @@ export class UserSessionInfo {
   id: string;
   @Field(() => String)
   role: string;
+}
+@ObjectType()
+export class GetUserInfoResponse {
+  @Field(() => Date, { nullable: true })
+  birthday: Date | null;
+  @Field(() => String, { nullable: true })
+  email: string | null;
+  @Field(() => String, { nullable: true })
+  firstName: string | null;
+  @Field(() => String, { nullable: true })
+  lastName: string | null;
+  @Field(() => String, { nullable: true })
+  username: string | null;
+  @Field(() => String, { nullable: true })
+  promoCode: string | null;
+  @Field(() => String)
+  gender: Gender | null;
 }
 @ObjectType()
 export class SetupUserInfoResponse {
@@ -43,9 +61,9 @@ export class CheckVerificationCodeResponse {
 @InputType()
 export class SetupUserInfoInput {
   @Field(() => String, { nullable: true })
-  fName: string;
+  firstName: string;
   @Field(() => String, { nullable: true })
-  lName?: string;
+  lastName?: string;
   @Field(() => String, { nullable: true })
   username?: string;
   @Field(() => String, { nullable: true })
