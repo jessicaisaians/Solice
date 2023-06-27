@@ -207,9 +207,10 @@ export class UserResolver {
         email,
         promoCode,
         gender,
+        isLogin,
         username,
       } = options;
-      await setupUserInfoInputSchema.validate(options, {
+      await setupUserInfoInputSchema(isLogin).validate(options, {
         abortEarly: false,
       });
 

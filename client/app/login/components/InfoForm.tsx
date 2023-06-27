@@ -21,8 +21,8 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaAsterisk } from "react-icons/fa";
 
 enum GenderEnum {
-  FEMALE = "FEMALE",
-  MALE = "MALE",
+  FEMALE = "female",
+  MALE = "male",
 }
 interface InfoFormProps {}
 
@@ -53,9 +53,13 @@ const InfoForm: FC<InfoFormProps> = () => {
   useEffect(() => {
     if (userInfo) {
       const regex = new RegExp(/\S+@\S+\.\S+/);
-      const { birthday, email, ...info } = userInfo.getUserInfo;
+      const { gender, birthday, email, ...info } = userInfo.getUserInfo;
       const hasEmail = regex.test(email ?? "");
-      reset({ ...info, ...(hasEmail && { email }) });
+      reset({
+        ...info,
+        ...(hasEmail && { email }),
+        ...{ gender: gender.toLowerCase() },
+      });
       setDay(dateToYYMMDD(birthday)?.day ?? 0);
       setMonth(dateToYYMMDD(birthday)?.month ?? 0);
       setYear(dateToYYMMDD(birthday)?.year ?? 0);
@@ -84,8 +88,9 @@ const InfoForm: FC<InfoFormProps> = () => {
     const data = await setupInfoMutation({
       variables: {
         options: {
+          isLogin: !hasPassword,
           gender,
-          birthday,
+          ...(year > 0 && month > 0 && day > 0 && { birthday }),
           confPassword,
           email,
           firstName,
@@ -98,6 +103,9 @@ const InfoForm: FC<InfoFormProps> = () => {
     });
     if (data?.data?.setupUserInfo?.errors) {
       data?.data?.setupUserInfo?.errors?.map((err) => {
+        if (err.path === "gender") {
+          toast.error(err.message);
+        }
         setError(err.path, {
           type: "custom",
           message: err.message,

@@ -78,4 +78,6 @@ export class SetupUserInfoInput {
   confPassword?: string;
   @Field(() => String)
   gender: string;
+  @Field(() => Boolean)
+  isLogin: boolean;
 }

@@ -47,97 +47,109 @@ export const formatYupError = (err: yup.ValidationError): FieldError[] => {
   return errors;
 };
 
-export const setupUserInfoInputSchema = yup.object().shape(
-  {
-    fName: yup
-      .string()
-      .optional()
-      .nullable()
-      .notRequired()
-      .when("fName", {
-        is: (value: any) => value?.length,
-        then: (rule) =>
-          rule
-            .matches(firstNameRegex, fieldInvalidMsg("نام"))
-            .max(20, fieldMaxMsg("نام", 20)),
-      }),
-    lName: yup
-      .string()
-      .optional()
-      .nullable()
-      .notRequired()
-      .when("lName", {
-        is: (value: any) => value?.length,
-        then: (rule) =>
-          rule
-            .matches(firstNameRegex, fieldInvalidMsg("نام خانوادگی"))
-            .max(20, fieldMaxMsg("نام خانوادگی", 20)),
-      }),
-    username: yup
-      .string()
-      .optional()
-      .nullable()
-      .notRequired()
-      .when("username", {
-        is: (value: any) => value?.length,
-        then: (rule) =>
-          rule
-            .matches(usernameRegex, fieldInvalidMsg("نام کاربری"))
-            .max(20, fieldMaxMsg("نام کاربری", 20)),
-      }),
-    email: yup
-      .string()
-      .required(fieldRequiredMsg("آدرس ایمیل"))
-      .email(fieldInvalidMsg("آدرس ایمیل")),
-    promoCode: yup.string().nullable(),
-    birthday: yup.date().typeError(fieldInvalidMsg("تاریخ تولد")).nullable(),
-    gender: yup
-      .string()
-      .nullable()
-      .notRequired()
-      .oneOf(["male", "female"], fieldInvalidMsg("جنسیت")),
+export const setupUserInfoInputSchema = (passRequired: boolean) =>
+  yup.object().shape(
+    {
+      fName: yup
+        .string()
+        .optional()
+        .nullable()
+        .notRequired()
+        .when("fName", {
+          is: (value: any) => value?.length,
+          then: (rule) =>
+            rule
+              .matches(firstNameRegex, fieldInvalidMsg("نام"))
+              .max(20, fieldMaxMsg("نام", 20)),
+        }),
+      lName: yup
+        .string()
+        .optional()
+        .nullable()
+        .notRequired()
+        .when("lName", {
+          is: (value: any) => value?.length,
+          then: (rule) =>
+            rule
+              .matches(firstNameRegex, fieldInvalidMsg("نام خانوادگی"))
+              .max(20, fieldMaxMsg("نام خانوادگی", 20)),
+        }),
+      username: yup
+        .string()
+        .optional()
+        .nullable()
+        .notRequired()
+        .when("username", {
+          is: (value: any) => value?.length,
+          then: (rule) =>
+            rule
+              .matches(usernameRegex, fieldInvalidMsg("نام کاربری"))
+              .max(20, fieldMaxMsg("نام کاربری", 20)),
+        }),
+      email: yup
+        .string()
+        .required(fieldRequiredMsg("آدرس ایمیل"))
+        .email(fieldInvalidMsg("آدرس ایمیل")),
+      promoCode: yup.string().nullable(),
+      birthday: yup.date().typeError(fieldInvalidMsg("تاریخ تولد")).nullable(),
+      gender: yup
+        .string()
+        .nullable()
+        .notRequired()
+        .oneOf(["male", "female"], fieldInvalidMsg("جنسیت")),
 
-    password: yup
-      .string()
-      .required(fieldRequiredMsg("رمز عبور"))
-      .matches(strongRegex, passwordPatternError),
-    confPassword: yup
-      .string()
-      .required(fieldRequiredMsg("تکرار عبور"))
-      .oneOf(
-        [yup.ref("password")],
-        "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
-      ),
-    // password: yup
-    //   .string()
-    //   .optional()
-    //   .nullable()
-    //   .notRequired()
-    //   .when("password", {
-    //     is: (value: any) => value?.length,
-    //     then: (rule) => rule.matches(strongRegex, passwordPatternError),
-    //   }),
-    // confPassword: yup
-    //   .string()
-    //   .optional()
-    //   .nullable()
-    //   .notRequired()
-    //   .when("password", {
-    //     is: (value: any) => value?.length,
-    //     then: (rule) =>
-    //       rule
-    //         .required(fieldRequiredMsg("تکرار رمز عبور"))
-    //         .oneOf(
-    //           [yup.ref("password")],
-    //           "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
-    //         ),
-    //   }),
-  },
-  [
-    // Add Cyclic deps here because when require itself
-    ["fName", "fName"],
-    ["lName", "lName"],
-    ["username", "username"],
-    // ["password", "password"],
-  ]
-);
+      ...(passRequired
+        ? {
+            password: yup
+              .string()
+              .required(fieldRequiredMsg("رمز عبور"))
+              .matches(strongRegex, passwordPatternError),
+            confPassword: yup
+              .string()
+              .required(fieldRequiredMsg("تکرار عبور"))
+              .oneOf(
+                [yup.ref("password")],
+                "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
+              ),
+          }
+        : {
+            password: yup
+              .string()
+              .optional()
+              .nullable()
+              .notRequired()
+              .when("password", {
+                is: (value: any) => value?.length,
+                then: (rule) => rule.matches(strongRegex, passwordPatternError),
+              }),
+            confPassword: yup
+              .string()
+              .optional()
+              .nullable()
+              .notRequired()
+              .when("password", {
+                is: (value: any) => value?.length,
+                then: (rule) =>
+                  rule
+                    .required(fieldRequiredMsg("تکرار رمز عبور"))
+                    .oneOf(
+                      [yup.ref("password")],
+                      "تکرار رمز عبور باید با رمز عبور مطابقت داشته باشد."
+                    ),
+              }),
+          }),
+    },
+    passRequired
+      ? [
+          // Add Cyclic deps here because when require itself
+          ["fName", "fName"],
+          ["lName", "lName"],
+          ["username", "username"],
+        ]
+      : [
+          ["fName", "fName"],
+          ["lName", "lName"],
+          ["username", "username"],
+          ["password", "password"],
+        ]
+  );

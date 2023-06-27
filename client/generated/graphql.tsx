@@ -98,6 +98,7 @@ export type SetupUserInfoInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   firstName?: InputMaybe<Scalars['String']['input']>;
   gender: Scalars['String']['input'];
+  isLogin: Scalars['Boolean']['input'];
   lastName?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   promoCode?: InputMaybe<Scalars['String']['input']>;
