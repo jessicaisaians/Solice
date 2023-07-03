@@ -1,16 +1,17 @@
 import * as yup from "yup";
-import { FieldError } from "../types";
-export const phoneRegex = /^(0|0098|\+98)9(0[1-5]|[1 3]\d|2[0-2]|98)\d{7}$/;
-export const strongRegex = new RegExp(
-  "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
-);
-const usernameRegex = /^(?=.*[A-Za-z])[A-Za-z0-9_.]{1,30}$/;
-const firstNameRegex = /^[\u0600-\u06FFa-zA-Z\s]{3,}$/;
+import {
+  firstNameRegex,
+  phoneRegex,
+  strongRegex,
+  usernameRegex,
+} from "../regex";
+import {
+  fieldInvalidMsg,
+  fieldMaxMsg,
+  fieldMinMsg,
+  fieldRequiredMsg,
+} from "./errMessages";
 
-export const fieldInvalidMsg = (fieldName: string) =>
-  `${fieldName} معتبر نمی باشد.`;
-export const fieldRequiredMsg = (fieldName: string) =>
-  `وارد کردن ${fieldName} اجباری می باشد.`;
 export const passwordPatternError =
   "رمز عبور باید حداقل 8 کاراکتر باشد و شامل حروف بزرگ و کوچک انگلیسی، اعداد و حروف ویژه (!@#$%^&*) باشد.";
 
@@ -18,10 +19,6 @@ export const mobValidate = yup
   .string()
   .matches(phoneRegex, fieldInvalidMsg("شماره موبایل"));
 
-export const fieldMinMsg = (fieldName: string, min: number) =>
-  `طول ${fieldName} باید حداقل ${min} کاراکتر باشد`;
-export const fieldMaxMsg = (fieldName: string, max: number) =>
-  `طول ${fieldName} باید حداکثر ${max} کاراکتر باشد`;
 export const mobileValidator = yup.object().shape({
   mobile: mobValidate,
 });
@@ -34,18 +31,6 @@ export const checkVerificationCodeValidator = yup.object().shape({
     .max(4, fieldMaxMsg("کد وارد شده", 4))
     .required(fieldRequiredMsg("کد وارد شده")),
 });
-
-export const formatYupError = (err: yup.ValidationError): FieldError[] => {
-  const errors: FieldError[] = [];
-
-  err?.inner?.forEach((e: any) => {
-    errors.push({
-      path: e.path,
-      message: e.message,
-    });
-  });
-  return errors;
-};
 
 export const setupUserInfoInputSchema = (passRequired: boolean) =>
   yup.object().shape(

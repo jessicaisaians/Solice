@@ -8,30 +8,132 @@ datasource db {
     url      = env("MONGODB_URI")
 }
 
-model Account {
-    id                String  @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String  @db.ObjectId
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? @db.String
-    access_token      String? @db.String
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? @db.String
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    @@unique([provider, providerAccountId])
+model Color {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String   @unique
+    hexCode       String
+    totProducts   Int      @default(0)
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
 }
 
-model Session {
-    id           String   @id @default(auto()) @map("_id") @db.ObjectId
-    sessionToken String   @unique
-    userId       String   @db.ObjectId
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Size {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    totProducts   Int      @default(0)
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+type Measurments {
+    group String
+    label String
+    value String
+}
+
+model Review {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    productCode   String
+    product       Product  @relation(fields: [productCode], references: [productCode])
+    rating        Int?
+    review        String?
+    userId        String   @db.ObjectId
+    user          User     @relation(fields: [userId], references: [id])
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model SizeGuide {
+    id            String        @id @default(auto()) @map("_id") @db.ObjectId
+    brandId       String        @db.ObjectId
+    measurments   Measurments[]
+    schemaVersion Float         @default(1.0)
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+}
+
+type Attributes {
+    key   String
+    value String
+}
+
+model Brand {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    totProducts   Int      @default(0)
+    totSells      Int      @default(0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    schemaVersion Float    @default(1.0)
+}
+
+model Category {
+    id               String     @id @default(auto()) @map("_id") @db.ObjectId
+    name             String
+    totProducts      Int        @default(0)
+    totSells         Int        @default(0)
+    schemaVersion    Float      @default(1.0)
+    createdAt        DateTime   @default(now())
+    updatedAt        DateTime   @updatedAt
+    parentCategoryId String?    @db.ObjectId
+    parentCategory   Category?  @relation("parentCategory", fields: [parentCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    childCategories  Category[] @relation("parentCategory")
+}
+
+model Product {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String?
+    sku         String        @unique
+    slug        String        @unique
+    productCode String        @unique
+    tags        String[]
+    categoryIds String[]      @db.ObjectId
+    brandId     String        @db.ObjectId
+    brandName   String
+    totWishlist Int           @default(0)
+    totColors   Int           @default(0)
+    totSells    Int           @default(0)
+    totReviews  Int           @default(0)
+    totRatings  Int           @default(0)
+    sumRatings  Int           @default(0)
+    attributes  Attributes[]
+    status      ProductStatus
+
+    mainImage           String
+    mainDiscountPercent Float
+    mainDiscountExpiry  DateTime
+    mainPrice           Float
+
+    reviews       Review[]
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model ProductVariant {
+    id              String         @id @default(auto()) @map("_id") @db.ObjectId
+    productCode     String
+    sku             String         @unique
+    colorId         String         @db.ObjectId
+    sizeId          String[]       @db.ObjectId
+    sizeName        String
+    colorName       String
+    isMainVariant   Boolean
+    images          String[]
+    price           Float
+    stockCnt        Int
+    attributes      Attributes[]
+    discountPercent Int            @default(0)
+    discountExpiry  DateTime
+    totSells        Int            @default(0)
+    schemaVersion   Float          @default(1.0)
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    wishlistItem    WishlistItem[]
 }
 
 enum Role {
@@ -44,56 +146,156 @@ enum Gender {
     MALE
 }
 
+enum ProductStatus {
+    DRAFTED
+    PUBLISHED
+}
+
+model CartItem {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    qty           Int
+    cart          Cart?    @relation(fields: [cartId], references: [id])
+    cartId        String?  @db.ObjectId
+    productId     String   @db.ObjectId
+    price         Float
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model Cart {
+    id            String     @id @default(auto()) @map("_id") @db.ObjectId
+    user          User[]
+    userId        String     @db.ObjectId
+    qty           Int
+    items         CartItem[]
+    schemaVersion Float      @default(1.0)
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+}
+
+model Payment {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    amount        Float
+    refId         String
+    paymentCode   String
+    success       Boolean
+    userId        String   @db.ObjectId
+    user          User     @relation(fields: [userId], references: [id])
+    orderId       String   @db.ObjectId
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+enum DiscountType {
+    PERCENTAGE
+    FIXED
+}
+
+model DiscountCode {
+    id            String       @id @default(auto()) @map("_id") @db.ObjectId
+    code          String       @unique
+    amnt          Float?
+    expiresAt     DateTime
+    type          DiscountType
+    isActive      Boolean      @default(true)
+    categoryIds   String[]     @db.ObjectId
+    brandIds      String[]     @db.ObjectId
+    Order         Order[]
+    schemaVersion Float        @default(1.0)
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+}
+
+enum OrderStatus {
+    Cancelled
+    Confirmed
+    Preparing
+    OutForDelivery
+    Delivered
+}
+
+type CartEmbed {
+    productId       String @db.ObjectId
+    variantId       String @db.ObjectId
+    name            String
+    image           String
+    qty             Int
+    price           Float
+    discountPercent Float
+}
+
+model Order {
+    id              String       @id @default(auto()) @map("_id") @db.ObjectId
+    user            User         @relation(fields: [userId], references: [id])
+    userId          String       @db.ObjectId
+    discountCodeId  String       @db.ObjectId
+    discount        DiscountCode @relation(fields: [discountCodeId], references: [id])
+    status          OrderStatus
+    total           Float
+    shippingAddress Address
+    cart            CartEmbed
+    schemaVersion   Float        @default(1.0)
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
+}
+
+type Address {
+    postalCode String
+    city       String
+    address    String
+    landline   String
+}
+
 model User {
-    id            String                     @id @default(auto()) @map("_id") @db.ObjectId
-    role          Role                       @default(USER)
-    mobile        String                     @unique
-    username      String?                    @unique
-    email         String?                    @unique
-    firstName     String?
-    lastName      String?
+    id                         String         @id @default(auto()) @map("_id") @db.ObjectId
+    firstName                  String?
+    lastName                   String?
+    username                   String?        @unique
+    email                      String?        @unique
+    emailVerified              DateTime?
+    mobile                     String         @unique
+    gender                     Gender?        @default(MALE)
+    birthday                   DateTime?
+    password                   String?
+    referralCode               String         @unique
+    referrals                  User[]         @relation("Referrals")
+    referrerId                 String?        @db.ObjectId
+    referrer                   User?          @relation("Referrals", fields: [referrerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    totReferral                Int            @default(0)
+    referralExpiry             DateTime?
+    perReferralDiscountPercent Float          @default(0)
+    reviews                    Review[]
+    payments                   Payment[]
+    orders                     Order[]
+    cartId                     String?        @db.ObjectId
+    cart                       Cart?          @relation(fields: [cartId], references: [id])
+    addresses                  Address[]
+    schemaVersion              Float          @default(1.0)
+    createdAt                  DateTime       @default(now())
+    updatedAt                  DateTime       @updatedAt
+    wishlistItems              WishlistItem[] @relation("UserWishlist")
+}
+
+model WishlistItem {
+    id            String         @id @default(auto()) @map("_id") @db.ObjectId
+    user          User           @relation("UserWishlist", fields: [userId], references: [id])
+    userId        String         @db.ObjectId
+    product       ProductVariant @relation(fields: [productId], references: [id])
+    productId     String         @db.ObjectId
+    schemaVersion Float          @default(1.0)
+    updatedAt     DateTime       @updatedAt
+    createdAt     DateTime       @default(now())
+}
+
+model Admin {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    mobile        String   @unique
+    username      String?  @unique
+    email         String?  @unique
     password      String?
-    emailVerified DateTime?
-    gender        Gender?                    @default(MALE)
-    birthday      DateTime?
-    promoCode     String?
-    accounts      Account[]
-    sessions      Session[]
-    conversations ConversationParticipants[]
-    messages      Message[]
-    createdAt     DateTime                   @default(now())
-    updatedAt     DateTime                   @updatedAt
-}
-
-model Conversation {
-    id              String                     @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt       DateTime                   @default(now())
-    updatedAt       DateTime                   @updatedAt
-    participants    ConversationParticipants[]
-    messages        Message[]
-    latestMessageId String?                    @unique @db.ObjectId
-    latestMessage   Message?                   @relation(fields: [latestMessageId], references: [id], name: "latestMessage", onDelete: NoAction, onUpdate: NoAction)
-}
-
-model ConversationParticipants {
-    id                 String       @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt          DateTime     @default(now())
-    updatedAt          DateTime     @updatedAt
-    conversationId     String       @db.ObjectId
-    conversation       Conversation @relation(fields: [conversationId], references: [id])
-    userId             String       @db.ObjectId
-    user               User         @relation(fields: [userId], references: [id])
-    hasSeenLastMessage Boolean
-}
-
-model Message {
-    id             String        @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
-    conversationId String        @db.ObjectId
-    conversation   Conversation  @relation(fields: [conversationId], references: [id])
-    senderId       String        @db.ObjectId
-    body           String
-    sender         User          @relation(fields: [senderId], references: [id])
-    latestIn       Conversation? @relation(name: "latestMessage")
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
 }

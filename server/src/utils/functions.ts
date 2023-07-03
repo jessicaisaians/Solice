@@ -1,7 +1,7 @@
 import kave from "kavenegar";
 import fetch from "node-fetch";
 import { promisify } from "util";
-import { formatYupError } from "./validators/user";
+import { formatYupError } from "./validators/errMessages";
 
 export const sendKaveSms = async ({
   kaveApi,
@@ -23,10 +23,19 @@ export const sendKaveSms = async ({
     throw new Error("مشکلی در ارسال پیامک رخ داده است. لطفا مجددا تلاش کنید.");
 };
 
-export const handleReturnError = (err: any) => ({
+export const handleReturnError = (
+  err: any,
+  path?: string | null,
+  message?: string | null
+) => ({
   errors: !!err?.errors
     ? formatYupError(err)
-    : [{ path: "", message: err?.message ?? "مشکلی رخ داده است." }],
+    : [
+        {
+          path: path ?? "",
+          message: message ?? err?.message ?? "مشکلی رخ داده است.",
+        },
+      ],
   success: false,
 });
 

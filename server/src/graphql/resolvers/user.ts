@@ -189,6 +189,7 @@ export class UserResolver {
         }
       }
     } catch (err: any) {
+
       return handleReturnError(err);
     }
   }

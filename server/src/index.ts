@@ -60,7 +60,8 @@ const main = async () => {
     origin: [process.env.CORS_ORIGIN as string],
     credentials: true,
   };
-  app.use("/uploads", express.static("public"));
+  app.use("/product_imgs", express.static("public/images/products"));
+  // app.use("/products", express.static("public/images/products"));
   app.use(
     "/graphql",
     cors(corsOptions),
