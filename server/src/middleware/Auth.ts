@@ -15,14 +15,7 @@ export const isUserAuth: MiddlewareFn<GraphQLContext> = async (
     else {
       const user = await context.prisma.user.findFirst({
         where: {
-          AND: [
-            {
-              role: "USER",
-            },
-            {
-              id: context.session?.user?.id,
-            },
-          ],
+          id: context.session?.user?.id,
         },
       });
       if (!user)
@@ -49,16 +42,9 @@ export const isAdminAuth: MiddlewareFn<GraphQLContext> = async (
         },
       });
     else {
-      const isAdmin = await context.prisma.user.findFirst({
+      const isAdmin = await context.prisma.admin.findFirst({
         where: {
-          AND: [
-            {
-              role: "ADMIN",
-            },
-            {
-              id: context.session?.user?.id,
-            },
-          ],
+          id: context.session?.user?.id,
         },
       });
       if (!isAdmin) {

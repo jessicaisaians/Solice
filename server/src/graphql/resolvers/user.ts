@@ -1,4 +1,3 @@
-import { Role } from "@prisma/client";
 import argon2 from "argon2";
 import pick from "lodash.pick";
 import {
@@ -10,7 +9,7 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { isUserAuth } from "../../middleware/Auth";
-import { handleReturnError } from "../../utils/functions";
+import { generateReferralCode, handleReturnError } from "../../utils/functions";
 import { GraphQLContext } from "../../utils/types";
 import {
   CheckVerificationCodeResponse,
@@ -30,7 +29,7 @@ export class UserResolver {
   @Query(() => SendVerificationCodeResponse)
   async sendVerificationCode(
     @Arg("mobile") mobile: string,
-    @Ctx() { myCache, prisma, kaveApi }: GraphQLContext
+    @Ctx() { myCache, prisma }: GraphQLContext
   ): Promise<SendVerificationCodeResponse> {
     try {
       await mobileValidator.validate(
@@ -83,7 +82,6 @@ export class UserResolver {
       const user = await prisma.user.findFirst({
         where: {
           mobile,
-          role: Role.USER,
         },
       });
       if (!user) throw new Error("کاربر با این مشخصات یافت نشد.");
@@ -122,17 +120,27 @@ export class UserResolver {
     try {
       const user = await prisma.user.findUnique({
         where: { mobile: mobile.trim() },
+        include: {
+          referrer: {
+            select: {
+              referralCode: true,
+            },
+          },
+        },
       });
       if (!user) throw new Error("کاربری با مشخصات وارد شده یافت نشد");
-      return pick(user, [
-        "birthday",
-        "email",
-        "firstName",
-        "lastName",
-        "gender",
-        "username",
-        "promoCode",
-      ]);
+      const referrerCode = user?.referrer?.referralCode;
+      return {
+        referrerCode,
+        ...pick(user, [
+          "birthday",
+          "email",
+          "firstName",
+          "lastName",
+          "gender",
+          "username",
+        ]),
+      };
     } catch (err) {
       throw new Error(err?.message ?? err);
     }
@@ -158,9 +166,13 @@ export class UserResolver {
       const lastCode = myCache.get(mob);
       if (myCode !== lastCode) throw new Error("کد وارد شده نامعتبر می‌باشد.");
       else {
+        let referralCode = generateReferralCode();
+        while (await prisma.user.findUnique({ where: { referralCode } })) {
+          referralCode = generateReferralCode();
+        }
         try {
           const user = await prisma.user.create({
-            data: { mobile, username: mobile, email: mobile },
+            data: { mobile, username: mobile, email: mobile, referralCode },
           });
           return {
             isLogin: false,
@@ -173,7 +185,6 @@ export class UserResolver {
             const user = await prisma.user.findFirst({
               where: {
                 mobile,
-                role: Role.USER,
               },
             });
             if (!user) throw new Error("کاربر با این مشخصات یافت نشد.");
@@ -189,7 +200,6 @@ export class UserResolver {
         }
       }
     } catch (err: any) {
-
       return handleReturnError(err);
     }
   }
@@ -215,6 +225,23 @@ export class UserResolver {
         abortEarly: false,
       });
 
+      const referrerUser = promoCode
+        ? await prisma.user.findUnique({
+            where: {
+              referralCode: promoCode,
+            },
+          })
+        : null;
+      if (!referrerUser && !!promoCode)
+        return {
+          success: false,
+          errors: [
+            {
+              path: "promoCode",
+              message: "کد معرف وارد شده نامعتبر می‌باشد.",
+            },
+          ],
+        };
       const hashedPassword = password ? await argon2.hash(password!) : null;
       try {
         const user = await prisma.user.update({
@@ -222,9 +249,9 @@ export class UserResolver {
             id: session?.user?.id,
           },
           data: {
+            referrerId: referrerUser?.id,
             ...(firstName && { firstName }),
             ...(lastName && { lastName }),
-            ...(promoCode && { promoCode }),
             ...(hashedPassword && { password: hashedPassword }),
             ...(birthday && { birthday }),
             ...(email && { email }),
@@ -232,11 +259,13 @@ export class UserResolver {
             ...(username && { username }),
           },
         });
+        if (referrerUser) {
+          referrerUser.totReferrals = referrerUser.totReferrals + 1;
+        }
         return {
           success: true,
           user: {
             id: user.id,
-            role: user.role,
           },
         };
       } catch (err) {

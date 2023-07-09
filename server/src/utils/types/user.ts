@@ -16,8 +16,6 @@ export class SendVerificationCodeResponse {
 export class UserSessionInfo {
   @Field(() => String)
   id: string;
-  @Field(() => String)
-  role: string;
 }
 @ObjectType()
 export class GetUserInfoResponse {
@@ -32,7 +30,7 @@ export class GetUserInfoResponse {
   @Field(() => String, { nullable: true })
   username: string | null;
   @Field(() => String, { nullable: true })
-  promoCode: string | null;
+  referrerCode: string | null|undefined;
   @Field(() => String)
   gender: Gender | null;
 }

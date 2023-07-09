@@ -31,6 +31,14 @@ export const checkVerificationCodeValidator = yup.object().shape({
     .max(4, fieldMaxMsg("کد وارد شده", 4))
     .required(fieldRequiredMsg("کد وارد شده")),
 });
+export const renameCategoryValidator = yup.object().shape({
+  newName: yup
+    .string()
+    .typeError("نام وارد شده نامعتبر می باشد.")
+    .min(2, fieldMinMsg("نام وارد شده", 2))
+    .max(20, fieldMaxMsg("نام وارد شده", 20))
+    .required(fieldRequiredMsg("نام وارد شده")),
+});
 
 export const setupUserInfoInputSchema = (passRequired: boolean) =>
   yup.object().shape(

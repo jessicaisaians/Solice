@@ -4,5 +4,5 @@ export const strongRegex = new RegExp(
 );
 export const usernameRegex = /^(?=.*[A-Za-z])[A-Za-z0-9_.]{1,30}$/;
 export const firstNameRegex = /^[\u0600-\u06FFa-zA-Z\s]{3,}$/;
-
+export const persianEnglishDigitSpaceRegex = /^[\u0600-\u06FFa-zA-Z0-9\s]{2,}$/;
 export const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;

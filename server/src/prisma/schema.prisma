@@ -53,6 +53,7 @@ model SizeGuide {
     schemaVersion Float         @default(1.0)
     createdAt     DateTime      @default(now())
     updatedAt     DateTime      @updatedAt
+    brand         Brand?
 }
 
 type Attributes {
@@ -61,26 +62,26 @@ type Attributes {
 }
 
 model Brand {
-    id            String   @id @default(auto()) @map("_id") @db.ObjectId
-    name          String
-    totProducts   Int      @default(0)
-    totSells      Int      @default(0)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-    schemaVersion Float    @default(1.0)
+    id            String     @id @default(auto()) @map("_id") @db.ObjectId
+    name          String     @unique
+    totProducts   Int        @default(0)
+    totSells      Int        @default(0)
+    sizeGuideId   String?    @unique @db.ObjectId
+    sizeGuide     SizeGuide? @relation(fields: [sizeGuideId], references: [id])
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+    schemaVersion Float      @default(1.0)
 }
 
 model Category {
-    id               String     @id @default(auto()) @map("_id") @db.ObjectId
-    name             String
-    totProducts      Int        @default(0)
-    totSells         Int        @default(0)
-    schemaVersion    Float      @default(1.0)
-    createdAt        DateTime   @default(now())
-    updatedAt        DateTime   @updatedAt
-    parentCategoryId String?    @db.ObjectId
-    parentCategory   Category?  @relation("parentCategory", fields: [parentCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    childCategories  Category[] @relation("parentCategory")
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    path          String
+    schemaVersion Float    @default(1.0)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    @@unique([name, path])
 }
 
 model Product {
@@ -91,7 +92,7 @@ model Product {
     slug        String        @unique
     productCode String        @unique
     tags        String[]
-    categoryIds String[]      @db.ObjectId
+    categoryId  String        @db.ObjectId
     brandId     String        @db.ObjectId
     brandName   String
     totWishlist Int           @default(0)
@@ -103,25 +104,29 @@ model Product {
     attributes  Attributes[]
     status      ProductStatus
 
-    mainImage           String
-    mainDiscountPercent Float
-    mainDiscountExpiry  DateTime
-    mainPrice           Float
+    mainImage           String?
+    mainDiscountPercent Float?
+    mainDiscountExpiry  DateTime?
+    mainPrice           Float?
 
-    reviews       Review[]
-    schemaVersion Float    @default(1.0)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    productVariants ProductVariant[]
+    reviews         Review[]
+    schemaVersion   Float            @default(1.0)
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
 }
 
 model ProductVariant {
     id              String         @id @default(auto()) @map("_id") @db.ObjectId
-    productCode     String
+    productCode     String         @unique
+    productId       String         @db.ObjectId
+    product         Product        @relation(fields: [productId], references: [id])
     sku             String         @unique
     colorId         String         @db.ObjectId
-    sizeId          String[]       @db.ObjectId
+    sizeId          String         @db.ObjectId
     sizeName        String
     colorName       String
+    colorHex        String
     isMainVariant   Boolean
     images          String[]
     price           Float
@@ -249,33 +254,32 @@ type Address {
 }
 
 model User {
-    id                         String         @id @default(auto()) @map("_id") @db.ObjectId
-    firstName                  String?
-    lastName                   String?
-    username                   String?        @unique
-    email                      String?        @unique
-    emailVerified              DateTime?
-    mobile                     String         @unique
-    gender                     Gender?        @default(MALE)
-    birthday                   DateTime?
-    password                   String?
-    referralCode               String         @unique
-    referrals                  User[]         @relation("Referrals")
-    referrerId                 String?        @db.ObjectId
-    referrer                   User?          @relation("Referrals", fields: [referrerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    totReferral                Int            @default(0)
-    referralExpiry             DateTime?
-    perReferralDiscountPercent Float          @default(0)
-    reviews                    Review[]
-    payments                   Payment[]
-    orders                     Order[]
-    cartId                     String?        @db.ObjectId
-    cart                       Cart?          @relation(fields: [cartId], references: [id])
-    addresses                  Address[]
-    schemaVersion              Float          @default(1.0)
-    createdAt                  DateTime       @default(now())
-    updatedAt                  DateTime       @updatedAt
-    wishlistItems              WishlistItem[] @relation("UserWishlist")
+    id                     String         @id @default(auto()) @map("_id") @db.ObjectId
+    firstName              String?
+    lastName               String?
+    username               String?        @unique
+    email                  String?        @unique
+    emailVerified          DateTime?
+    mobile                 String         @unique
+    gender                 Gender?        @default(MALE)
+    birthday               DateTime?
+    password               String?
+    referralCode           String         @unique
+    referrerId             String?        @db.ObjectId
+    referrer               User?          @relation("Referrals", fields: [referrerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    referrals              User[]         @relation("Referrals")
+    totReferrals           Int            @default(0)
+    totSuccessfulReferrals Int            @default(0)
+    reviews                Review[]
+    payments               Payment[]
+    orders                 Order[]
+    cartId                 String?        @db.ObjectId
+    cart                   Cart?          @relation(fields: [cartId], references: [id])
+    addresses              Address[]
+    schemaVersion          Float          @default(1.0)
+    createdAt              DateTime       @default(now())
+    updatedAt              DateTime       @updatedAt
+    wishlistItems          WishlistItem[] @relation("UserWishlist")
 }
 
 model WishlistItem {

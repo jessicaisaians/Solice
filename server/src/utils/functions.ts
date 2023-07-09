@@ -1,8 +1,8 @@
 import kave from "kavenegar";
 import fetch from "node-fetch";
 import { promisify } from "util";
+import { v4 as uuidv4 } from "uuid";
 import { formatYupError } from "./validators/errMessages";
-
 export const sendKaveSms = async ({
   kaveApi,
   msgBody,
@@ -45,4 +45,18 @@ export const getServerSession = async (cookie: string) => {
   });
   const session = await res.json();
   return session;
+};
+
+export const generateReferralCode = () => {
+  return uuidv4().split("-")[0]; // Use only the first part of the UUID for the referral code
+};
+
+export const getReferralExpiry = () => {
+  const expiryDate = new Date();
+
+  // Add one month to the current date
+  expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+  // return the referralExpiry property of the referrerUser
+  return expiryDate;
 };

@@ -48,7 +48,7 @@ const main = async () => {
   const server = new ApolloServer({
     schema,
     csrfPrevention: true,
-
+    introspection: true,
     plugins: [
       // Proper shutdown for the HTTP server.
       ApolloServerPluginDrainHttpServer({ httpServer }),

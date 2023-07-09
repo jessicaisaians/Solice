@@ -21,3 +21,11 @@ export const setupColorValidator = yup.object().shape({
     .max(12, fieldMaxMsg("نام رنگ", 12))
     .required(fieldRequiredMsg("نام رنگ")),
 });
+
+export const setupBrandValidator = yup.object().shape({
+  name: yup
+    .string()
+    .min(2, fieldMinMsg("نام برند", 2))
+    .max(30, fieldMaxMsg("نام برند", 30))
+    .required(fieldRequiredMsg("نام برند")),
+});
