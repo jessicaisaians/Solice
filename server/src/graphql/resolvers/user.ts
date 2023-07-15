@@ -10,9 +10,12 @@ import {
 } from "type-graphql";
 import { isUserAuth } from "../../middleware/Auth";
 import { generateReferralCode, handleReturnError } from "../../utils/functions";
+import { objectIdPattern } from "../../utils/regex";
 import { GraphQLContext } from "../../utils/types";
 import {
   CheckVerificationCodeResponse,
+  GetProductsInput,
+  GetProductsResponse,
   GetUserInfoResponse,
   SendVerificationCodeResponse,
   SetupUserInfoInput,
@@ -301,5 +304,166 @@ export class UserResolver {
       console.log(err?.code);
       return handleReturnError(err);
     }
+  }
+
+  // * Products
+  @Query(() => GetProductsResponse)
+  async getProducts(
+    @Arg("options", () => GetProductsInput) options: GetProductsInput,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<GetProductsResponse> {
+    try {
+      const {
+        brands,
+        categories,
+        colors,
+        justDiscounted,
+        justInStock,
+        limit,
+        maxPrice,
+        minPrice,
+        offset,
+        sizes,
+        descOrAsc,
+        sortBy,
+      } = options;
+      const sortDir = descOrAsc === "asc" ? "asc" : "desc";
+      const orderByOptions = [
+        {
+          title: "name",
+          obj: { name: sortDir },
+        },
+        {
+          title: "price",
+          obj: { price: sortDir },
+        },
+        { title: "stock", obj: { stockCnt: sortDir } },
+      ];
+
+      const orderBy = orderByOptions.find((item) => item.title === sortBy);
+      const areIdsValid = [
+        ...(colors ?? []),
+        ...(categories ?? []),
+        ...(brands ?? []),
+        ...(sizes ?? []),
+      ]?.every((item) => objectIdPattern.test(item));
+      if (!areIdsValid) throw new Error("شناسه وارد شده نامعتبر می‌باشد.");
+      const products = await prisma.product.findMany({
+        where: {
+          AND: [
+            {
+              status: "PUBLISHED",
+              ...(!!categories?.length && {
+                categoryId: {
+                  in: categories,
+                },
+              }),
+            },
+
+            {
+              ...(!!brands?.length && {
+                brandId: {
+                  in: brands,
+                },
+              }),
+            },
+            {
+              ...(justInStock && {
+                productVariants: {
+                  some: {
+                    stockCnt: {
+                      gt: 0,
+                    },
+                  },
+                },
+              }),
+            },
+            {
+              ...(justDiscounted === true && {
+                productVariants: {
+                  some: {
+                    AND: [
+                      {
+                        discountPercent: {
+                          gt: 0,
+                        },
+                        discountExpiry: {
+                          lt: new Date(),
+                          not: null,
+                        },
+                      },
+                    ],
+                  },
+                },
+              }),
+            },
+            {
+              ...(!!colors?.length && {
+                productVariants: {
+                  some: {
+                    colorId: {
+                      in: colors,
+                    },
+                  },
+                },
+              }),
+            },
+            {
+              ...(!!sizes?.length && {
+                productVariants: {
+                  some: {
+                    sizeId: {
+                      in: sizes,
+                    },
+                  },
+                },
+              }),
+            },
+            {
+              ...((!!minPrice || !!maxPrice) && {
+                productVariants: {
+                  some: {
+                    price: {
+                      ...(!!minPrice && { gte: minPrice }),
+                      ...(!!maxPrice && { lte: maxPrice }),
+                    },
+                  },
+                },
+              }),
+            },
+          ],
+        },
+
+        skip: offset ?? 0,
+        take: limit ?? 15,
+        orderBy: [
+          orderBy?.title === "name"
+            ? {
+                name: sortDir,
+              }
+            : {
+                createdAt: sortDir,
+              },
+        ],
+        include: {
+          productVariants: {
+            ...(!!orderBy?.title && {
+              orderBy: [orderBy.obj as any],
+            }),
+          },
+        },
+      });
+
+      return {
+        success: true,
+        products,
+      };
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
+  catch(err: any) {
+    console.log(err?.code);
+    return handleReturnError(err);
   }
 }

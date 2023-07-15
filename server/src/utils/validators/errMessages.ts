@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { FieldError } from "../types";
 export const fieldInvalidMsg = (fieldName: string) =>
-  `${fieldName} معتبر نمی باشد.`;
+  `${fieldName} معتبر نمی‌باشد.`;
 export const fieldRequiredMsg = (fieldName: string) =>
   `وارد کردن ${fieldName} اجباری می باشد.`;
 export const fieldMinMsg = (fieldName: string, min: number) =>

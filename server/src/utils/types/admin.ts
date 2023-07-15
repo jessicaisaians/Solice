@@ -39,8 +39,8 @@ export class ReOrderCategoryInput {
 }
 @InputType()
 export class SetupBrandInput {
-  @Field(() => String)
-  id: string;
+  @Field(() => String, { nullable: true })
+  id: string | null;
   @Field(() => String, { nullable: true })
   name: string;
 }
@@ -61,12 +61,12 @@ export class SetupProductInput {
   sku: string;
   @Field(() => String)
   productCode: string;
-  @Field(() => String)
-  brandId: string;
-  @Field(() => String)
-  brandName: string;
-  @Field(() => String)
-  status: string;
+  @Field(() => String, { nullable: true })
+  brandId: string | null;
+  @Field(() => String, { nullable: true })
+  brandName: string | null;
+  @Field(() => String, { nullable: true })
+  status: string | null;
   @Field(() => [String])
   tags: string[];
   @Field(() => [ProductAttr])
@@ -74,7 +74,7 @@ export class SetupProductInput {
   @Field(() => String)
   categoryId: string;
   @Field(() => String, { nullable: true })
-  description: string;
+  description: string | null;
 }
 @InputType()
 export class SetupProductVariantInput {
@@ -104,12 +104,33 @@ export class SetupProductVariantInput {
   sku: string;
 }
 @InputType()
-export class RemoveBrandInput {
+export class MeasurmentsInput {
+  @Field(() => String)
+  group: string;
+  @Field(() => String)
+  label: string;
+  @Field(() => String)
+  value: string;
+  @Field(() => String)
+  size: string;
+}
+@InputType()
+export class SetupSizeGuideInput {
+  @Field(() => String, { nullable: true })
+  id: string;
+  @Field(() => String)
+  brandId: string;
+  @Field(() => [MeasurmentsInput])
+  measurments: MeasurmentsInput[];
+}
+@InputType()
+export class RemoveItemInput {
   @Field(() => String)
   id: string;
   @Field(() => String, { nullable: true })
-  substituteBrandId?: string;
+  substituteId?: string;
 }
+
 @InputType()
 export class RemoveColorInput {
   @Field(() => String)

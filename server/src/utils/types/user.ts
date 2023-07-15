@@ -1,16 +1,19 @@
 import { Gender } from "@prisma/client";
 import { Field, InputType, ObjectType } from "type-graphql";
+
 import { FieldError } from ".";
+import { Product } from "./../../prisma/generated/prisma-client-js/models/Product";
+
 @ObjectType()
 export class SendVerificationCodeResponse {
   @Field(() => Boolean)
   success: boolean;
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
   @Field(() => Boolean, { nullable: true })
   isLogin?: boolean;
   @Field(() => Boolean, { nullable: true })
   hasPassword?: boolean;
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
 }
 @ObjectType()
 export class UserSessionInfo {
@@ -30,7 +33,7 @@ export class GetUserInfoResponse {
   @Field(() => String, { nullable: true })
   username: string | null;
   @Field(() => String, { nullable: true })
-  referrerCode: string | null|undefined;
+  referrerCode: string | null | undefined;
   @Field(() => String)
   gender: Gender | null;
 }
@@ -78,4 +81,41 @@ export class SetupUserInfoInput {
   gender: string;
   @Field(() => Boolean)
   isLogin: boolean;
+}
+@InputType()
+export class GetProductsInput {
+  @Field(() => String, { nullable: true })
+  sortBy?: string;
+  @Field(() => String, { nullable: true })
+  descOrAsc?: string;
+  @Field(() => Number, { nullable: true })
+  offset?: number;
+  @Field(() => Number, { nullable: true })
+  limit?: number;
+  @Field(() => [String], { nullable: true })
+  brands?: string[];
+  @Field(() => [String], { nullable: true })
+  sizes?: string[];
+  @Field(() => [String], { nullable: true })
+  colors?: string[];
+  @Field(() => [String], { nullable: true })
+  categories?: string[];
+  @Field(() => Boolean, { nullable: true })
+  justInStock?: boolean;
+  @Field(() => Boolean, { nullable: true })
+  justDiscounted?: boolean;
+  @Field(() => Number, { nullable: true })
+  minPrice?: number;
+  @Field(() => Number, { nullable: true })
+  maxPrice?: number;
+}
+
+@ObjectType()
+export class GetProductsResponse {
+  @Field(() => [Product], { nullable: true })
+  products?: Product[];
+  @Field(() => Boolean)
+  success: boolean;
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
 }

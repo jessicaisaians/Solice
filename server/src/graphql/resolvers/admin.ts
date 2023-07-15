@@ -1,3 +1,4 @@
+import { Category, ProductVariant } from "@prisma/client";
 import slugify from "slugify";
 import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
 import { handleReturnError } from "../../utils/functions";
@@ -6,8 +7,8 @@ import { GraphQLContext } from "../../utils/types";
 import {
   ProductStatus,
   ReOrderCategoryInput,
-  RemoveBrandInput,
   RemoveColorInput,
+  RemoveItemInput,
   RenameCategoryInput,
   SetupBrandInput,
   SetupCategoryInput,
@@ -15,10 +16,13 @@ import {
   SetupColorResponse,
   SetupProductInput,
   SetupProductVariantInput,
+  SetupSizeGuideInput,
 } from "../../utils/types/admin";
 import {
+  measurmentsValidator,
   setupBrandValidator,
   setupColorValidator,
+  setupProductValidator,
 } from "../../utils/validators/admin";
 import { renameCategoryValidator } from "../../utils/validators/user";
 
@@ -59,6 +63,16 @@ export class AdminResolver {
           name,
         },
       });
+      if (id)
+        await prisma.productVariant.updateMany({
+          where: {
+            colorId: id,
+          },
+          data: {
+            colorHex: hexCode,
+            colorName: name,
+          },
+        });
       return {
         success: true,
       };
@@ -102,7 +116,7 @@ export class AdminResolver {
             name: "چندرنگ",
           },
         });
-      const result = await prisma.productVariant.updateMany({
+      await prisma.productVariant.updateMany({
         where: {
           colorId: id,
         },
@@ -112,7 +126,6 @@ export class AdminResolver {
           colorName: substituteColor.name,
         },
       });
-      substituteColor.totProducts += result.count;
       return {
         success: true,
       };
@@ -126,7 +139,110 @@ export class AdminResolver {
   }
   //* End of Color
 
-  // * Brand
+  // * Start of Size
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async createOrEditSize(
+    @Arg("options", () => SetupBrandInput) options: SetupBrandInput,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      const { name, id } = options;
+      await setupBrandValidator.validate(
+        {
+          name,
+        },
+        { abortEarly: false }
+      );
+
+      await prisma.size.upsert({
+        where: id
+          ? {
+              id,
+            }
+          : {
+              name,
+            },
+        update: {
+          name,
+        },
+        create: {
+          name,
+        },
+      });
+      if (id)
+        await prisma.productVariant.updateMany({
+          where: {
+            sizeId: id,
+          },
+          data: {
+            sizeName: name,
+          },
+        });
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2002"
+        ? handleReturnError(err, "name", "سایز دیگری با این نام وجود دارد.")
+        : err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async removeSize(
+    @Arg("options", () => RemoveItemInput) options: RemoveItemInput,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      // remove the brand and replace the colroId of prodcutVariants wiht that brandId
+      const { substituteId: substituteSizeId, id } = options;
+      await prisma.size.delete({
+        where: {
+          id,
+        },
+      });
+      // find the replacement size by Id or find the default size and if it doesnt exist create it and if it doesrzzzzzzzzzzzzz
+      let substituteBrand = await prisma.size.findUnique({
+        where: substituteSizeId
+          ? {
+              id: substituteSizeId,
+            }
+          : {
+              name: "نامشخص",
+            },
+      });
+      if (!substituteBrand)
+        substituteBrand = await prisma.size.create({
+          data: {
+            name: "نامشخص",
+          },
+        });
+
+      await prisma.productVariant.updateMany({
+        where: {
+          sizeId: id,
+        },
+        data: {
+          sizeId: substituteSizeId,
+          sizeName: substituteBrand.name,
+        },
+      });
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2002"
+        ? handleReturnError(err, "name", "رنگ دیگری با این نام وجود دارد.")
+        : err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  // * End of Size
+  // * Start of Brand
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async createOrEditBrand(
@@ -171,12 +287,12 @@ export class AdminResolver {
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async removeBrand(
-    @Arg("options", () => RemoveBrandInput) options: RemoveBrandInput,
+    @Arg("options", () => RemoveItemInput) options: RemoveItemInput,
     @Ctx() { prisma }: GraphQLContext
   ): Promise<SetupColorResponse> {
     try {
       // remove the brand and replace the colroId of prodcutVariants wiht that brandId
-      const { substituteBrandId, id } = options;
+      const { substituteId: substituteBrandId, id } = options;
       await prisma.brand.delete({
         where: {
           id,
@@ -232,7 +348,7 @@ export class AdminResolver {
     }
   }
   // * End of Brand
-  // * Category
+  // * Start of Category
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async createCategory(
@@ -322,7 +438,7 @@ export class AdminResolver {
       let updatedItemInErrorBlockIds: string[] = [];
       // Update the category's leaf categories by replacing the categories name followed by a comma with an empty string
       await Promise.all(
-        result.map(async (category) => {
+        result.map(async (category: Category) => {
           console.log(
             "before------------------" + category.path + "-----" + category.name
           );
@@ -385,7 +501,7 @@ export class AdminResolver {
                   },
                 });
               await Promise.all(
-                catsThatHaveCatRemovedFromPath.map(async (item) => {
+                catsThatHaveCatRemovedFromPath.map(async (item: Category) => {
                   const itemNewPath = item.path.replace(category.name, newName);
                   const itemNewName =
                     item.name === category.name ? newName : item.name;
@@ -410,7 +526,7 @@ export class AdminResolver {
                 },
               });
               await Promise.all(
-                itemsToBeUpdated.map(async (item) => {
+                itemsToBeUpdated.map(async (item: Category) => {
                   const itemPath = item.path
                     .replace(catToRemove.name + ",", "")
                     .replace(category.name, newName);
@@ -457,7 +573,6 @@ export class AdminResolver {
         : handleReturnError(err);
     }
   }
-  
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async renameCategory(
@@ -499,7 +614,7 @@ export class AdminResolver {
         where: { path: { contains: path } },
       });
       await Promise.all(
-        result.map(async (category) => {
+        result.map(async (category: Category) => {
           if (category.name === name) {
             category.name = newName;
           }
@@ -561,7 +676,7 @@ export class AdminResolver {
           where: { path: { startsWith: oldPath } },
         });
         await Promise.all(
-          result.map(async (category) => {
+          result.map(async (category: Category) => {
             try {
               category.path = category.path.replace(oldPath, newPath);
               await prisma.category.update({
@@ -584,7 +699,7 @@ export class AdminResolver {
           where: { path: { startsWith: oldPath } },
         });
         await Promise.all(
-          result.map(async (category) => {
+          result.map(async (category: Category) => {
             try {
               if (category.id === id) {
                 // root
@@ -627,7 +742,7 @@ export class AdminResolver {
     }
   }
   // * End of Category
-  // * Product
+  // * Start of Product
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async createOrEditProduct(
@@ -643,17 +758,47 @@ export class AdminResolver {
         description,
         productCode,
         sku,
+        categoryId,
         status,
         tags,
         attributes,
-        categoryId,
       } = options;
+      await setupProductValidator.validate(
+        {
+          name,
+          sku,
+          productCode,
+          description,
+          tags,
+          attributes,
+        },
+        { abortEarly: false }
+      );
+
       const slugTime = new Date().getTime();
       const slugTitle = slugify(options.name);
       const slug = `${slugTitle}-${slugTime}`;
+
+      let miscBrand = null;
+      if (!brandId) {
+        miscBrand = await prisma.brand.findUnique({
+          where: { name: "نامشخص" },
+        });
+        if (!miscBrand) {
+          miscBrand = await prisma.brand.create({
+            data: {
+              name: "نامشخص",
+            },
+          });
+        }
+      }
+      const cat = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!cat) throw new Error("دسته انتخاب شده نامعتبر می‌باشد.");
       const data = {
-        brandId,
-        brandName,
+        brandId: brandId ?? miscBrand!.id,
+        brandName: brandName ?? miscBrand!.name,
         name,
         sku,
         description: description ?? "",
@@ -671,22 +816,95 @@ export class AdminResolver {
         await prisma.product.create({
           data: data,
         });
+        await prisma.brand.update({
+          where: {
+            id: brandId ?? miscBrand?.id,
+          },
+          data: {
+            totProducts: {
+              increment: 1,
+            },
+          },
+        });
       } else {
+        const product = await prisma.product.findUnique({
+          where: {
+            id,
+          },
+        });
+        const oldBrandId = product?.brandId;
+        const newBrandId = brandId;
         await prisma.product.update({
           where: {
             id,
           },
           data,
         });
+        if (oldBrandId !== newBrandId) {
+          await prisma.brand.update({
+            where: {
+              id: newBrandId ?? miscBrand?.id,
+            },
+            data: {
+              totProducts: {
+                increment: 1,
+              },
+            },
+          });
+          await prisma.brand.update({
+            where: {
+              id: oldBrandId,
+            },
+            data: {
+              totProducts: {
+                decrement: 1,
+              },
+            },
+          });
+        }
       }
+
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2002"
+        ? handleReturnError(err, "name", "محصول دیگری با این مشخصات وجود دارد.")
+        : err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async removeProduct(
+    @Arg("id", () => String) id: string,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      const product = await prisma.product.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          brandId: true,
+        },
+      });
+      if (!product) throw new Error("محصول موردنظر یافت نشد.");
+
       await prisma.brand.update({
         where: {
-          id: brandId,
+          id: product.brandId,
         },
         data: {
           totProducts: {
-            increment: 1,
+            decrement: 1,
           },
+        },
+      });
+      await prisma.product.delete({
+        where: {
+          id,
         },
       });
       return {
@@ -694,12 +912,14 @@ export class AdminResolver {
       };
     } catch (err: any) {
       return err?.code === "P2002"
-        ? handleReturnError(err, "name", "برند دیگری با این نام وجود دارد.")
+        ? handleReturnError(err, "name", "محصول دیگری با این مشخصات وجود دارد.")
         : err?.code === "P2023"
         ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
         : handleReturnError(err);
     }
   }
+  // * End of Product
+  // * Start of Product Variant
   @Mutation(() => SetupColorResponse)
   // @UseMiddleware(isAdminAuth)
   async createOrEditProductVariant(
@@ -776,57 +996,258 @@ export class AdminResolver {
         productCode: product.productCode,
         productId: productId,
       };
+
+      const productVariants = await prisma.productVariant.findMany({
+        where: {
+          productId,
+        },
+      });
+      let newTotColors = product.totColors;
+      let curVariant = null;
       if (!id) {
-        await prisma.productVariant.create({
+        curVariant = await prisma.productVariant.create({
           data,
         });
+
+        if (
+          productVariants.findIndex(
+            (item: ProductVariant) => item.colorId === colorId
+          ) < 0
+        )
+          newTotColors++;
       } else {
-        await prisma.productVariant.update({
+        const variantToUpdate = await prisma.productVariant.findFirst({
           where: {
             id,
           },
+        });
+        if (!variantToUpdate) throw new Error("محصول موردنظر یافت نشد.");
+        const oldColorId = variantToUpdate.colorId;
+        if (oldColorId !== colorId) {
+          let variantsWithOldColorId = 0;
+          productVariants.map((item: ProductVariant) => {
+            if (item.colorId === oldColorId && item.id !== id)
+              variantsWithOldColorId++;
+          });
+          if (variantsWithOldColorId === 0) newTotColors--;
+          const newColorExists =
+            productVariants.findIndex(
+              (item: ProductVariant) => item.colorId === colorId
+            ) >= 0;
+          if (!newColorExists) newTotColors++;
+        }
+
+        await prisma.productVariant.update({
+          where: { id },
           data,
         });
       }
-      if (isMainVariant) {
-        product.mainDiscountExpiry = discountExpiry;
-        product.mainDiscountPercent = discountPercent;
-        product.mainImage = images?.[0];
-        product.mainPrice = price;
+      if (isMainVariant && product.mainVariantId) {
+        await prisma.productVariant.update({
+          where: { id: product.mainVariantId },
+          data: {
+            isMainVariant: false,
+          },
+        });
       }
-      const variantsWithThisColorCnt = await prisma.productVariant.count({
+      await prisma.product.update({
         where: {
-          AND: {
-            productId,
-            colorId,
+          id: productId,
+        },
+        data: {
+          ...(isMainVariant && {
+            mainVariantId: id ?? curVariant!.id,
+            mainDiscountExpiry: discountExpiry,
+            mainDiscountPercent: discountPercent,
+            mainImage: images?.[0],
+            mainPrice: price,
+          }),
+          totColors: newTotColors,
+        },
+      });
+
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2002"
+        ? handleReturnError(err, "name", "محصول دیگری با این نام وجود دارد.")
+        : err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async removeProductVariant(
+    @Arg("id", () => String)
+    id: string,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      const variant = await prisma.productVariant.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          product: {
+            select: {
+              totColors: true,
+            },
           },
         },
       });
-      if (variantsWithThisColorCnt === 0) {
-        product.totColors += 1;
-        color.totProducts += 1;
-      }
-      const variantsWithThisSizeCnt = await prisma.productVariant.count({
+      if (!variant) throw new Error("محصول موردنظر یافت نشد.");
+
+      const productVariants = await prisma.productVariant.findMany({
         where: {
-          AND: {
-            productId,
-            sizeId,
-          },
+          productId: variant.productId,
         },
       });
-      if (variantsWithThisSizeCnt === 0) {
-        size.totProducts += 1;
+
+      let newTotColors = variant.product.totColors;
+
+      const variantToUpdate = await prisma.productVariant.findFirst({
+        where: {
+          id,
+        },
+      });
+      if (!variantToUpdate) throw new Error("محصول موردنظر یافت نشد.");
+      const colorToRemove = variantToUpdate.colorId;
+
+      let variantsWithOldColorId = 0;
+      productVariants.map((item: ProductVariant) => {
+        if (item.colorId === colorToRemove && item.id !== id)
+          variantsWithOldColorId++;
+      });
+      if (variantsWithOldColorId === 0) newTotColors--;
+      let mainVariantProperties = {};
+      const isVarToRemoveMain = variant.isMainVariant;
+      if (isVarToRemoveMain) {
+        const newMainVariantId = productVariants.findIndex(
+          (item: ProductVariant) => item.id !== id
+        );
+        if (newMainVariantId < 0) {
+          // the variant we removed was the only variant of this product
+          mainVariantProperties = {
+            mainDiscountExpiry: null,
+            mainDiscountPercent: 0,
+            mainImage: "",
+            mainPrice: 0,
+          };
+        } else {
+          mainVariantProperties = {
+            mainDiscountExpiry:
+              productVariants[newMainVariantId].discountExpiry,
+            mainDiscountPercent:
+              productVariants[newMainVariantId].discountPercent,
+            mainImage: productVariants[newMainVariantId].images?.[0] ?? "",
+            mainPrice: productVariants[newMainVariantId].price,
+          };
+        }
+      }
+      await prisma.productVariant.delete({
+        where: { id },
+      });
+
+      await prisma.product.update({
+        where: {
+          id: variant.productId,
+        },
+        data: {
+          ...(isVarToRemoveMain && mainVariantProperties),
+          totColors: newTotColors,
+        },
+      });
+
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2002"
+        ? handleReturnError(err, "name", "محصول دیگری با این نام وجود دارد.")
+        : err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  // * End of Product Variant
+  // * Start of Product Measurments
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async addOrEditSizeGuide(
+    @Arg("options", () => SetupSizeGuideInput)
+    options: SetupSizeGuideInput,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      const { measurments, id, brandId } = options;
+      await measurmentsValidator.validate(
+        { measurments },
+        { abortEarly: false }
+      );
+      const brand = await prisma.brand.findUnique({
+        where: {
+          id: brandId,
+        },
+      });
+      if (!brand) throw new Error("برند موردنظر یافت نشد.");
+      if (id) {
+        const measurmentToEdit = await prisma.sizeGuide.findUnique({
+          where: {
+            id,
+          },
+        });
+        if (!measurmentToEdit)
+          throw new Error("جدول سایزبندی موردنظر یافت نشد.");
+
+        await prisma.sizeGuide.update({
+          where: { id },
+          data: {
+            brandId,
+            measurments,
+          },
+        });
+      } else {
+        await prisma.sizeGuide.create({
+          data: {
+            brandId,
+            measurments,
+          },
+        });
       }
       return {
         success: true,
       };
     } catch (err: any) {
       return err?.code === "P2002"
-        ? handleReturnError(err, "name", "برند دیگری با این نام وجود دارد.")
+        ? handleReturnError(err, "name", "محصول دیگری با این نام وجود دارد.")
         : err?.code === "P2023"
         ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
         : handleReturnError(err);
     }
   }
-  // * End of Product
+  @Mutation(() => SetupColorResponse)
+  // @UseMiddleware(isAdminAuth)
+  async removeSizeGuide(
+    @Arg("id", () => String)
+    id: string,
+    @Ctx() { prisma }: GraphQLContext
+  ): Promise<SetupColorResponse> {
+    try {
+      await prisma.sizeGuide.delete({
+        where: {
+          id,
+        },
+      });
+      return {
+        success: true,
+      };
+    } catch (err: any) {
+      return err?.code === "P2023"
+        ? handleReturnError(err, "id", "شناسه وارد شده نامعتبر می‌باشد.")
+        : handleReturnError(err);
+    }
+  }
+  // * End of Product Measurments
 }
